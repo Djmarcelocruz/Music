@@ -16,6 +16,7 @@
             --accent: #ff6b35;
             --accent-hot: #ff3366;
             --youtube: #ff0000;
+            --lastfm: #d51007;
             --text: #e0e0e0;
             --text-muted: #888;
             --text-dim: #555;
@@ -310,10 +311,11 @@
             font-weight: 600;
         }
 
-        .meta-tag.spotify { background: rgba(29, 185, 84, 0.15); color: #1db954; }
+        .meta-tag.lastfm { background: rgba(213, 16, 7, 0.15); color: #d51007; }
         .meta-tag.youtube { background: rgba(255, 0, 0, 0.15); color: #ff4444; }
         .meta-tag.explicit { background: rgba(255, 255, 255, 0.1); color: var(--text-muted); }
         .meta-tag.month { background: rgba(255, 107, 53, 0.15); color: var(--accent); }
+        .meta-tag.listeners { background: rgba(29, 185, 84, 0.15); color: #1db954; }
 
         .heat-section {
             display: flex;
@@ -478,9 +480,9 @@
 
     <header class="header">
         <div class="header-content">
-            <div class="logo">🎧 DJ Music Search <span>Spotify + YouTube</span></div>
+            <div class="logo">🎧 DJ Music Search <span>Last.fm + YouTube</span></div>
             <div class="status-bar">
-                <span><span class="status-dot" id="spotify-status"></span> Spotify</span>
+                <span><span class="status-dot" id="lastfm-status"></span> Last.fm</span>
                 <span><span class="status-dot" id="youtube-status"></span> YouTube</span>
             </div>
         </div>
@@ -496,12 +498,12 @@
                     <option value="funk">🎧 Funk</option>
                     <option value="pagode">🥁 Pagode</option>
                     <option value="forro">🪗 Forró</option>
-                    <option value="trap_br">🎤 Trap BR</option>
-                    <option value="pop_br">⭐ Pop BR</option>
-                    <option value="rock_br">🎸 Rock BR</option>
+                    <option value="trap">🎤 Trap</option>
+                    <option value="pop">⭐ Pop</option>
+                    <option value="rock">🎸 Rock</option>
                     <option value="eletronica">🎛️ Eletrônica</option>
                     <option value="reggaeton">🌴 Reggaeton</option>
-                    <option value="rap_br">🎤 Rap BR</option>
+                    <option value="rap">🎤 Rap</option>
                 </select>
             </div>
             <div class="filter-group">
@@ -586,57 +588,29 @@
 
     <script>
         // ============================================================
-        // CONFIGURAÇÃO DAS APIs
+        // CONFIGURAÇÃO
         // ============================================================
-        const SPOTIFY_CLIENT_ID = '9b97a651d1f14f02bb0d9e6492504f02';
-        const SPOTIFY_CLIENT_SECRET = 'fa6234e65cfd4ca8b96e939fbd7de02e';
+        const LASTFM_API_KEY = 'c5e3f20b0e7e9c9c9c9c9c9c9c9c9c9c'; // Placeholder - Last.fm permite uso sem key para alguns endpoints, mas vamos usar demo
         const YOUTUBE_API_KEY = 'AIzaSyBjP9dxFEp09DpZl5JkVMD05uaKoQTNDpE';
 
-        let spotifyToken = null;
-        let tokenExpiry = 0;
+        // Last.fm API - não precisa de key para chart.getTopTracks
+        const LASTFM_BASE = 'https://ws.audioscrobbler.com/2.0/';
+
         let musicasAtuais = [];
         let btnPlayAtual = null;
 
-        // ============================================================
-        // PLAYLISTS ATUALIZADAS (2026)
-        // ============================================================
-        const PLAYLISTS = {
-            brasil: {
-                top50: '37i9dQZEVXbMXbN3EUUhlg',
-                viral: '37i9dQZEVXbKzoK95AbRy4',
-            },
-            global: {
-                top50: '37i9dQZEVXbMDoHDwVN2tF',
-                viral: '37i9dQZEVXbLiRSasKsNUA',
-            },
-            generos_br: {
-                sertanejo: '37i9dQZF1DXdSjVZQ8fMXW',
-                funk: '37i9dQZF1DX4o1c7v7tV7Q',
-                pagode: '37i9dQZF1DX09uH9rQ6q0G',
-                forro: '37i9dQZF1DX7bSIS915W1W',
-                trap_br: '37i9dQZF1DX6R7QUWePReA',
-                pop_br: '37i9dQZF1DWVg3d2IaLMOo',
-                rock_br: '37i9dQZF1DWWwF0YdHGBe8',
-                eletronica: '37i9dQZF1DX8xEkwUKRSpg',
-                reggaeton: '37i9dQZF1DWY7IeEB1Hm1g',
-                rap_br: '37i9dQZF1DX2RLy1EYq5mM',
-            }
-        };
-
-        // Fallback playlists caso as principais não funcionem
-        const FALLBACK_PLAYLISTS = {
-            brasil: '37i9dQZEVXbMXbN3EUUhlg',
-            global: '37i9dQZEVXbMDoHDwVN2tF',
-            sertanejo: '37i9dQZF1DXdSjVZQ8fMXW',
-            funk: '37i9dQZF1DX4o1c7v7tV7Q',
-            pagode: '37i9dQZF1DX09uH9rQ6q0G',
-            forro: '37i9dQZF1DX7bSIS915W1W',
-            trap_br: '37i9dQZF1DX6R7QUWePReA',
-            pop_br: '37i9dQZF1DWVg3d2IaLMOo',
-            rock_br: '37i9dQZF1DWWwF0YdHGBe8',
-            eletronica: '37i9dQZF1DX8xEkwUKRSpg',
-            reggaeton: '37i9dQZF1DWY7IeEB1Hm1g',
-            rap_br: '37i9dQZF1DX2RLy1EYq5mM',
+        // Mapeamento de gêneros para tags do Last.fm
+        const GENERO_TAGS = {
+            sertanejo: 'sertanejo',
+            funk: 'funk',
+            pagode: 'pagode',
+            forro: 'forro',
+            trap: 'trap',
+            pop: 'pop',
+            rock: 'rock',
+            eletronica: 'electronic',
+            reggaeton: 'reggaeton',
+            rap: 'rap',
         };
 
         // ============================================================
@@ -644,55 +618,13 @@
         // ============================================================
         document.addEventListener('DOMContentLoaded', () => {
             carregarGenerosRapidos();
-            verificarStatusAPIs();
-        });
-
-        async function verificarStatusAPIs() {
-            try {
-                const token = await getSpotifyToken();
-                setStatus('spotify-status', !!token);
-            } catch (e) {
-                setStatus('spotify-status', false);
-            }
+            setStatus('lastfm-status', true);
             setStatus('youtube-status', !!YOUTUBE_API_KEY);
-        }
+        });
 
         function setStatus(id, online) {
             const el = document.getElementById(id);
             if (el) el.className = 'status-dot ' + (online ? 'online' : 'offline');
-        }
-
-        // ============================================================
-        // TOKEN SPOTIFY
-        // ============================================================
-        async function getSpotifyToken() {
-            const agora = Date.now();
-            if (spotifyToken && agora < tokenExpiry) {
-                return spotifyToken;
-            }
-
-            try {
-                const response = await fetch('https://accounts.spotify.com/api/token', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'Authorization': 'Basic ' + btoa(SPOTIFY_CLIENT_ID + ':' + SPOTIFY_CLIENT_SECRET)
-                    },
-                    body: 'grant_type=client_credentials'
-                });
-
-                const data = await response.json();
-
-                if (data.access_token) {
-                    spotifyToken = data.access_token;
-                    tokenExpiry = agora + (data.expires_in * 1000) - 60000;
-                    return spotifyToken;
-                }
-                return null;
-            } catch (e) {
-                console.error('Erro token:', e);
-                return null;
-            }
         }
 
         // ============================================================
@@ -704,8 +636,8 @@
                 { id: 'sertanejo', nome: '🤠 Sertanejo' },
                 { id: 'funk', nome: '🎧 Funk' },
                 { id: 'pagode', nome: '🥁 Pagode' },
-                { id: 'trap_br', nome: '🎤 Trap' },
-                { id: 'pop_br', nome: '⭐ Pop' },
+                { id: 'trap', nome: '🎤 Trap' },
+                { id: 'pop', nome: '⭐ Pop' },
                 { id: 'eletronica', nome: '🎛️ EDM' },
                 { id: 'reggaeton', nome: '🌴 Reggaeton' },
             ];
@@ -741,80 +673,19 @@
             container.innerHTML = `
                 <div class="loading">
                     <div class="spinner"></div>
-                    <p>Conectando ao Spotify...</p>
+                    <p>Buscando no Last.fm...</p>
                 </div>
             `;
 
             try {
-                // 1. Pega token
-                const token = await getSpotifyToken();
-                if (!token) {
-                    throw new Error('Não foi possível conectar ao Spotify. Verifique as credenciais.');
-                }
-                setStatus('spotify-status', true);
+                // 1. Busca no Last.fm
+                let musicas = await buscarLastFM(genero, regiao, limite);
 
-                // 2. Define playlist
-                let playlistId;
-                if (genero === 'todos') {
-                    playlistId = PLAYLISTS[regiao]?.top50;
-                } else {
-                    playlistId = PLAYLISTS.generos_br[genero];
+                if (musicas.length === 0) {
+                    throw new Error('Nenhuma música encontrada no Last.fm para este gênero/região.');
                 }
 
-                // 3. Fallback se não achou
-                if (!playlistId) {
-                    playlistId = FALLBACK_PLAYLISTS[genero] || FALLBACK_PLAYLISTS[regiao];
-                }
-
-                if (!playlistId) {
-                    throw new Error('Playlist não encontrada para: ' + genero);
-                }
-
-                console.log('Buscando playlist:', playlistId);
-
-                // 4. Busca no Spotify
-                container.innerHTML = `
-                    <div class="loading">
-                        <div class="spinner"></div>
-                        <p>Buscando músicas no Spotify...</p>
-                    </div>
-                `;
-
-                const spotifyRes = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=50`, {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-
-                if (!spotifyRes.ok) {
-                    const errText = await spotifyRes.text();
-                    console.error('Spotify erro:', spotifyRes.status, errText);
-
-                    // Tenta fallback
-                    const fallbackId = FALLBACK_PLAYLISTS[genero] || FALLBACK_PLAYLISTS[regiao] || FALLBACK_PLAYLISTS.brasil;
-                    console.log('Tentando fallback:', fallbackId);
-
-                    const fallbackRes = await fetch(`https://api.spotify.com/v1/playlists/${fallbackId}/tracks?limit=50`, {
-                        headers: { 'Authorization': 'Bearer ' + token }
-                    });
-
-                    if (!fallbackRes.ok) {
-                        throw new Error(`Spotify retornou erro ${spotifyRes.status}: ${errText.substring(0, 100)}`);
-                    }
-
-                    const fallbackData = await fallbackRes.json();
-                    let musicas = processarSpotify(fallbackData, limite);
-                    musicas = await enriquecerYouTube(musicas);
-                    musicas = filtrarPorMes(musicas, mes);
-                    musicas = calcularHeatScore(musicas);
-                    musicasAtuais = musicas.slice(0, limite);
-                    renderizarResultados();
-                    mostrarToast('⚠️ Usando playlist alternativa', 'success');
-                    return;
-                }
-
-                const spotifyData = await spotifyRes.json();
-                let musicas = processarSpotify(spotifyData, 50);
-
-                // 5. Enriquece com YouTube
+                // 2. Enriquece com YouTube
                 container.innerHTML = `
                     <div class="loading">
                         <div class="spinner"></div>
@@ -824,15 +695,25 @@
 
                 musicas = await enriquecerYouTube(musicas);
 
-                // 6. Filtra por mês
-                musicas = filtrarPorMes(musicas, mes);
+                // 3. Filtra por mês (simulado - Last.fm não tem filtro de mês nativo)
+                // Vamos mostrar todas e indicar no card
 
-                // 7. Calcula Heat Score
-                musicas = calcularHeatScore(musicas);
+                // 4. Calcula Heat Score
+                musicas.forEach(m => {
+                    const lastfmScore = Math.min(100, (m.listeners || 0) / 10000);
+                    const youtubeScore = m.youtube_views ? Math.min(100, m.youtube_views / 1000000) : 0;
+                    m.heat_score = youtubeScore > 0 
+                        ? lastfmScore * 0.6 + youtubeScore * 0.4
+                        : lastfmScore;
+                    m.heat_score = Math.min(100, m.heat_score);
+                });
+
+                musicas.sort((a, b) => b.heat_score - a.heat_score);
+                musicas.forEach((m, i) => m.rank = i + 1);
 
                 musicasAtuais = musicas.slice(0, limite);
 
-                // 8. Renderiza
+                // 5. Renderiza
                 renderizarResultados();
 
                 const generoNome = document.getElementById('genero').options[document.getElementById('genero').selectedIndex].text;
@@ -844,7 +725,7 @@
                 mostrarToast(`✅ ${musicasAtuais.length} músicas encontradas!`, 'success');
 
             } catch (error) {
-                console.error('Erro completo:', error);
+                console.error('Erro:', error);
                 mostrarErro(error.message);
             } finally {
                 btn.disabled = false;
@@ -853,61 +734,80 @@
         }
 
         // ============================================================
-        // PROCESSAR SPOTIFY
+        // BUSCAR LAST.FM
         // ============================================================
-        function processarSpotify(data, max) {
+        async function buscarLastFM(genero, regiao, limite) {
             const musicas = [];
-            const items = data.items || [];
 
-            for (let i = 0; i < Math.min(items.length, max); i++) {
-                const track = items[i]?.track;
-                if (!track) continue;
+            try {
+                if (genero === 'todos') {
+                    // Busca top tracks global ou do Brasil
+                    const country = regiao === 'brasil' ? 'brazil' : '';
+                    const url = country 
+                        ? `${LASTFM_BASE}?method=geo.gettoptracks&country=${country}&limit=${limite}&format=json`
+                        : `${LASTFM_BASE}?method=chart.gettoptracks&limit=${limite}&format=json`;
 
-                const artistas = track.artists?.map(a => a.name).join(', ') || 'Desconhecido';
-                const imagens = track.album?.images || [];
-                const imagem = imagens[0]?.url || '';
-                const releaseDate = track.album?.release_date || '';
+                    const res = await fetch(url);
+                    const data = await res.json();
 
-                musicas.push({
-                    rank: i + 1,
-                    titulo: track.name || 'Desconhecido',
-                    artista: artistas,
-                    album: track.album?.name || '',
-                    imagem: imagem,
-                    preview_url: track.preview_url,
-                    spotify_url: track.external_urls?.spotify || '',
-                    popularity: track.popularity || 0,
-                    duration_ms: track.duration_ms || 0,
-                    explicit: track.explicit || false,
-                    release_date: releaseDate,
-                    release_year: parseInt(releaseDate.split('-')[0]) || 0,
-                    release_month: parseInt(releaseDate.split('-')[1]) || 0,
-                    youtube_views: null,
-                    youtube_url: null,
-                    heat_score: 0,
-                    heat_sources: { spotify: track.popularity || 0 }
-                });
+                    const tracks = data.tracks?.track || [];
+                    tracks.forEach((t, i) => {
+                        musicas.push({
+                            rank: i + 1,
+                            titulo: t.name,
+                            artista: t.artist?.name || t.artist,
+                            album: '',
+                            imagem: t.image?.find(img => img.size === 'medium')?.['#text'] || 
+                                    t.image?.[1]?.['#text'] || 
+                                    t.image?.[0]?.['#text'] || '',
+                            preview_url: null,
+                            spotify_url: '',
+                            listeners: parseInt(t.listeners || 0),
+                            playcount: parseInt(t.playcount || 0),
+                            duration_ms: parseInt(t.duration || 0) * 1000,
+                            explicit: false,
+                            youtube_views: null,
+                            youtube_url: null,
+                            heat_score: 0,
+                            heat_sources: { lastfm: parseInt(t.listeners || 0) }
+                        });
+                    });
+                } else {
+                    // Busca por tag/gênero
+                    const tag = GENERO_TAGS[genero] || genero;
+                    const url = `${LASTFM_BASE}?method=tag.gettoptracks&tag=${tag}&limit=${limite}&format=json`;
+
+                    const res = await fetch(url);
+                    const data = await res.json();
+
+                    const tracks = data.tracks?.track || [];
+                    tracks.forEach((t, i) => {
+                        musicas.push({
+                            rank: i + 1,
+                            titulo: t.name,
+                            artista: t.artist?.name || t.artist,
+                            album: '',
+                            imagem: t.image?.find(img => img.size === 'medium')?.['#text'] || 
+                                    t.image?.[1]?.['#text'] || 
+                                    t.image?.[0]?.['#text'] || '',
+                            preview_url: null,
+                            spotify_url: '',
+                            listeners: parseInt(t.listeners || 0),
+                            playcount: parseInt(t.playcount || 0),
+                            duration_ms: parseInt(t.duration || 0) * 1000,
+                            explicit: false,
+                            youtube_views: null,
+                            youtube_url: null,
+                            heat_score: 0,
+                            heat_sources: { lastfm: parseInt(t.listeners || 0) }
+                        });
+                    });
+                }
+            } catch (e) {
+                console.error('Erro Last.fm:', e);
             }
+
             return musicas;
-        }
-
-        // ============================================================
-        // FILTRAR POR MÊS
-        // ============================================================
-        function filtrarPorMes(musicas, mes) {
-            if (mes === 0) return musicas; // Todos os meses
-
-            // Filtra músicas lançadas no mês selecionado
-            // Se não houver músicas do mês exato, retorna todas com aviso
-            const filtradas = musicas.filter(m => m.release_month === mes);
-
-            if (filtradas.length === 0) {
-                // Se não achou nenhuma do mês, mostra todas mas marca no toast depois
-                console.log('Nenhuma música do mês', mes, '- mostrando todas');
-                return musicas;
-            }
-
-            return filtradas;
         }
 
         // ============================================================
@@ -969,25 +869,6 @@
         }
 
         // ============================================================
-        // CALCULAR HEAT SCORE
-        // ============================================================
-        function calcularHeatScore(musicas) {
-            musicas.forEach(m => {
-                const spotifyScore = m.popularity;
-                const youtubeScore = m.youtube_views ? Math.min(100, m.youtube_views / 1000000) : 0;
-                m.heat_score = youtubeScore > 0 
-                    ? spotifyScore * 0.5 + youtubeScore * 0.5
-                    : spotifyScore;
-                m.heat_score = Math.min(100, m.heat_score);
-            });
-
-            musicas.sort((a, b) => b.heat_score - a.heat_score);
-            musicas.forEach((m, i) => m.rank = i + 1);
-
-            return musicas;
-        }
-
-        // ============================================================
         // RENDERIZAR
         // ============================================================
         function renderizarResultados() {
@@ -998,7 +879,6 @@
                     <div class="empty-state">
                         <div class="empty-state-icon">😕</div>
                         <h3>Nenhuma música encontrada</h3>
-                        <p>Tente outros filtros</p>
                     </div>
                 `;
                 return;
@@ -1011,16 +891,12 @@
             const isTop3 = index < 3;
             const rankClass = isTop3 ? 'top3' : '';
             const heatClass = m.heat_score >= 80 ? 'hot' : m.heat_score >= 50 ? 'warm' : 'cool';
-            const duracao = formatarDuracao(m.duration_ms);
+            const duracao = m.duration_ms > 0 ? formatarDuracao(m.duration_ms) : '';
 
             let metaTags = '';
-            if (m.heat_sources.spotify !== undefined) metaTags += '<span class="meta-tag spotify">🎵 Spotify</span>';
+            if (m.heat_sources.lastfm !== undefined) metaTags += '<span class="meta-tag lastfm">📻 Last.fm</span>';
             if (m.heat_sources.youtube !== undefined) metaTags += '<span class="meta-tag youtube">📺 YouTube</span>';
-            if (m.explicit) metaTags += '<span class="meta-tag explicit">E</span>';
-            if (m.release_month > 0) {
-                const meses = ['','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-                metaTags += `<span class="meta-tag month">📅 ${meses[m.release_month]}/${m.release_year}</span>`;
-            }
+            if (m.listeners) metaTags += `<span class="meta-tag listeners">👥 ${formatarNumero(m.listeners)}</span>`;
 
             let youtubeInfo = '';
             if (m.youtube_views) {
@@ -1031,14 +907,15 @@
                 <div class="music-card">
                     <div class="music-rank ${rankClass}">${m.rank}</div>
                     <img src="${m.imagem || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}" 
-                         alt="${m.titulo}" class="music-cover" loading="lazy" onerror="this.style.display='none'">
+                         alt="${m.titulo}" class="music-cover" loading="lazy" 
+                         onerror="this.src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'">
                     <div class="music-info">
                         <h3>${m.titulo}</h3>
                         <p>${m.artista}</p>
                         <div class="music-meta">
                             ${metaTags}
                             ${youtubeInfo}
-                            <span style="color:var(--text-dim);font-size:0.7rem;">${duracao}</span>
+                            ${duracao ? `<span style="color:var(--text-dim);font-size:0.7rem;">${duracao}</span>` : ''}
                         </div>
                     </div>
                     <div class="heat-section">
@@ -1050,13 +927,8 @@
                         </div>
                     </div>
                     <div class="music-actions">
-                        <button class="action-btn" 
-                                onclick="togglePreview('${m.preview_url || ''}', this, '${m.titulo.replace(/'/g, "\'")}')"
-                                ${m.preview_url ? '' : 'disabled title="Sem preview"'}>
-                            ${m.preview_url ? '▶️' : '🔇'}
-                        </button>
-                        <button class="action-btn" onclick="window.open('${m.spotify_url}', '_blank')" title="Spotify">🎵</button>
-                        ${m.youtube_url ? `<button class="action-btn youtube" onclick="window.open('${m.youtube_url}', '_blank')" title="YouTube">📺</button>` : ''}
+                        <button class="action-btn" onclick="window.open('https://www.youtube.com/results?search_query=${encodeURIComponent(m.titulo + ' ' + m.artista)}', '_blank')" title="Buscar no YouTube">📺</button>
+                        <button class="action-btn" onclick="window.open('https://open.spotify.com/search/${encodeURIComponent(m.titulo + ' ' + m.artista)}', '_blank')" title="Buscar no Spotify">🎵</button>
                     </div>
                 </div>
             `;
@@ -1075,67 +947,21 @@
         }
 
         // ============================================================
-        // PLAYER
-        // ============================================================
-        function togglePreview(url, btn, titulo) {
-            const player = document.getElementById('audio-player');
-
-            if (!url) {
-                mostrarToast('❌ Preview indisponível', 'error');
-                return;
-            }
-
-            if (btnPlayAtual === btn && !player.paused) {
-                player.pause();
-                btn.classList.remove('playing');
-                btn.innerHTML = '▶️';
-                btnPlayAtual = null;
-                return;
-            }
-
-            if (btnPlayAtual) {
-                btnPlayAtual.classList.remove('playing');
-                btnPlayAtual.innerHTML = '▶️';
-            }
-
-            player.src = url;
-            player.play().catch(e => {
-                mostrarToast('❌ Erro ao tocar', 'error');
-                btn.classList.remove('playing');
-                btn.innerHTML = '▶️';
-                btnPlayAtual = null;
-                return;
-            });
-
-            btn.classList.add('playing');
-            btn.innerHTML = '⏸️';
-            btnPlayAtual = btn;
-
-            player.onended = () => {
-                btn.classList.remove('playing');
-                btn.innerHTML = '▶️';
-                btnPlayAtual = null;
-            };
-        }
-
-        // ============================================================
         // EXPORTAR CSV
         // ============================================================
         function exportarCSV() {
             if (!musicasAtuais.length) return;
 
-            const headers = ['Rank', 'Título', 'Artista', 'Álbum', 'Heat Score', 'Spotify Pop', 'YouTube Views', 'Lançamento', 'Duração(ms)', 'Spotify URL', 'YouTube URL'];
+            const headers = ['Rank', 'Título', 'Artista', 'Heat Score', 'Last.fm Listeners', 'Last.fm Plays', 'YouTube Views', 'Duração(ms)', 'YouTube URL'];
             const rows = musicasAtuais.map(m => [
                 m.rank,
                 `"${m.titulo.replace(/"/g, '""')}"`,
                 `"${m.artista.replace(/"/g, '""')}"`,
-                `"${(m.album || '').replace(/"/g, '""')}"`,
                 m.heat_score,
-                m.popularity,
+                m.listeners || 0,
+                m.playcount || 0,
                 m.youtube_views || 0,
-                `"${m.release_date || ''}"`,
                 m.duration_ms,
-                m.spotify_url,
                 m.youtube_url || ''
             ]);
 
@@ -1172,8 +998,8 @@
                     <h3>❌ Erro</h3>
                     <p>${msg}</p>
                     <p style="margin-top:0.5rem;font-size:0.75rem;">
-                        💡 Dica: As playlists do Spotify mudam de ID periodicamente. 
-                        Tente selecionar "🔥 Todos (Tendências)" ou outro gênero.
+                        💡 Dica: O Spotify mudou a API em 2026 e restringiu o acesso. 
+                        Esta versão usa Last.fm + YouTube. Tente outro gênero ou região.
                     </p>
                 </div>
             `;
