@@ -95,7 +95,7 @@
         }
 
         @media (min-width: 768px) {
-            .filters-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+            .filters-grid { grid-template-columns: repeat(3, 1fr); }
         }
 
         .filter-group label {
@@ -313,6 +313,7 @@
         .meta-tag.spotify { background: rgba(29, 185, 84, 0.15); color: #1db954; }
         .meta-tag.youtube { background: rgba(255, 0, 0, 0.15); color: #ff4444; }
         .meta-tag.explicit { background: rgba(255, 255, 255, 0.1); color: var(--text-muted); }
+        .meta-tag.month { background: rgba(255, 107, 53, 0.15); color: var(--accent); }
 
         .heat-section {
             display: flex;
@@ -456,18 +457,6 @@
         .toast.success { border-left: 4px solid var(--success); }
         .toast.error { border-left: 4px solid var(--danger); }
 
-        .spotify-login-btn {
-            background: linear-gradient(135deg, var(--primary), #169c46);
-            color: white;
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin: 1rem 0;
-        }
-
         @media (min-width: 768px) {
             .header { padding: 2rem; }
             .filters-section { padding: 1.5rem 2rem; }
@@ -521,6 +510,25 @@
                     <option value="2026">2026</option>
                     <option value="2025">2025</option>
                     <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>📆 Mês</label>
+                <select id="mes">
+                    <option value="0">Todos</option>
+                    <option value="1">Janeiro</option>
+                    <option value="2">Fevereiro</option>
+                    <option value="3">Março</option>
+                    <option value="4">Abril</option>
+                    <option value="5">Maio</option>
+                    <option value="6">Junho</option>
+                    <option value="7">Julho</option>
+                    <option value="8">Agosto</option>
+                    <option value="9">Setembro</option>
+                    <option value="10">Outubro</option>
+                    <option value="11">Novembro</option>
+                    <option value="12">Dezembro</option>
                 </select>
             </div>
             <div class="filter-group">
@@ -584,16 +592,23 @@
         const SPOTIFY_CLIENT_SECRET = 'fa6234e65cfd4ca8b96e939fbd7de02e';
         const YOUTUBE_API_KEY = 'AIzaSyBjP9dxFEp09DpZl5JkVMD05uaKoQTNDpE';
 
-        // Token do Spotify (renova automaticamente)
         let spotifyToken = null;
         let tokenExpiry = 0;
+        let musicasAtuais = [];
+        let btnPlayAtual = null;
 
         // ============================================================
-        // PLAYLISTS
+        // PLAYLISTS ATUALIZADAS (2026)
         // ============================================================
         const PLAYLISTS = {
-            brasil: { top50: '37i9dQZEVXbMXbN3EUUhlg', viral: '37i9dQZEVXbKzoK95AbRy4' },
-            global: { top50: '37i9dQZEVXbMDoHDwVN2tF', viral: '37i9dQZEVXbLiRSasKsNUA' },
+            brasil: {
+                top50: '37i9dQZEVXbMXbN3EUUhlg',
+                viral: '37i9dQZEVXbKzoK95AbRy4',
+            },
+            global: {
+                top50: '37i9dQZEVXbMDoHDwVN2tF',
+                viral: '37i9dQZEVXbLiRSasKsNUA',
+            },
             generos_br: {
                 sertanejo: '37i9dQZF1DXdSjVZQ8fMXW',
                 funk: '37i9dQZF1DX4o1c7v7tV7Q',
@@ -608,8 +623,21 @@
             }
         };
 
-        let musicasAtuais = [];
-        let btnPlayAtual = null;
+        // Fallback playlists caso as principais não funcionem
+        const FALLBACK_PLAYLISTS = {
+            brasil: '37i9dQZEVXbMXbN3EUUhlg',
+            global: '37i9dQZEVXbMDoHDwVN2tF',
+            sertanejo: '37i9dQZF1DXdSjVZQ8fMXW',
+            funk: '37i9dQZF1DX4o1c7v7tV7Q',
+            pagode: '37i9dQZF1DX09uH9rQ6q0G',
+            forro: '37i9dQZF1DX7bSIS915W1W',
+            trap_br: '37i9dQZF1DX6R7QUWePReA',
+            pop_br: '37i9dQZF1DWVg3d2IaLMOo',
+            rock_br: '37i9dQZF1DWWwF0YdHGBe8',
+            eletronica: '37i9dQZF1DX8xEkwUKRSpg',
+            reggaeton: '37i9dQZF1DWY7IeEB1Hm1g',
+            rap_br: '37i9dQZF1DX2RLy1EYq5mM',
+        };
 
         // ============================================================
         // INICIALIZAÇÃO
@@ -621,14 +649,11 @@
 
         async function verificarStatusAPIs() {
             try {
-                // Testa Spotify
                 const token = await getSpotifyToken();
                 setStatus('spotify-status', !!token);
             } catch (e) {
                 setStatus('spotify-status', false);
             }
-
-            // YouTube sempre "ok" se temos chave
             setStatus('youtube-status', !!YOUTUBE_API_KEY);
         }
 
@@ -660,12 +685,12 @@
 
                 if (data.access_token) {
                     spotifyToken = data.access_token;
-                    tokenExpiry = agora + (data.expires_in * 1000) - 60000; // 1 min antes de expirar
+                    tokenExpiry = agora + (data.expires_in * 1000) - 60000;
                     return spotifyToken;
                 }
                 return null;
             } catch (e) {
-                console.error('Erro ao obter token Spotify:', e);
+                console.error('Erro token:', e);
                 return null;
             }
         }
@@ -708,6 +733,7 @@
 
             const genero = document.getElementById('genero').value;
             const ano = document.getElementById('ano').value;
+            const mes = parseInt(document.getElementById('mes').value);
             const regiao = document.getElementById('regiao').value;
             const limite = parseInt(document.getElementById('limite').value);
 
@@ -715,7 +741,7 @@
             container.innerHTML = `
                 <div class="loading">
                     <div class="spinner"></div>
-                    <p>Buscando no Spotify...</p>
+                    <p>Conectando ao Spotify...</p>
                 </div>
             `;
 
@@ -725,7 +751,6 @@
                 if (!token) {
                     throw new Error('Não foi possível conectar ao Spotify. Verifique as credenciais.');
                 }
-
                 setStatus('spotify-status', true);
 
                 // 2. Define playlist
@@ -734,64 +759,92 @@
                     playlistId = PLAYLISTS[regiao]?.top50;
                 } else {
                     playlistId = PLAYLISTS.generos_br[genero];
-                    if (!playlistId) playlistId = PLAYLISTS[regiao]?.top50;
+                }
+
+                // 3. Fallback se não achou
+                if (!playlistId) {
+                    playlistId = FALLBACK_PLAYLISTS[genero] || FALLBACK_PLAYLISTS[regiao];
                 }
 
                 if (!playlistId) {
-                    throw new Error('Playlist não encontrada para este gênero/região.');
+                    throw new Error('Playlist não encontrada para: ' + genero);
                 }
 
-                // 3. Busca no Spotify
+                console.log('Buscando playlist:', playlistId);
+
+                // 4. Busca no Spotify
+                container.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Buscando músicas no Spotify...</p>
+                    </div>
+                `;
+
                 const spotifyRes = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=50`, {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
 
                 if (!spotifyRes.ok) {
-                    const err = await spotifyRes.json();
-                    throw new Error(err.error?.message || 'Erro no Spotify');
+                    const errText = await spotifyRes.text();
+                    console.error('Spotify erro:', spotifyRes.status, errText);
+
+                    // Tenta fallback
+                    const fallbackId = FALLBACK_PLAYLISTS[genero] || FALLBACK_PLAYLISTS[regiao] || FALLBACK_PLAYLISTS.brasil;
+                    console.log('Tentando fallback:', fallbackId);
+
+                    const fallbackRes = await fetch(`https://api.spotify.com/v1/playlists/${fallbackId}/tracks?limit=50`, {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+
+                    if (!fallbackRes.ok) {
+                        throw new Error(`Spotify retornou erro ${spotifyRes.status}: ${errText.substring(0, 100)}`);
+                    }
+
+                    const fallbackData = await fallbackRes.json();
+                    let musicas = processarSpotify(fallbackData, limite);
+                    musicas = await enriquecerYouTube(musicas);
+                    musicas = filtrarPorMes(musicas, mes);
+                    musicas = calcularHeatScore(musicas);
+                    musicasAtuais = musicas.slice(0, limite);
+                    renderizarResultados();
+                    mostrarToast('⚠️ Usando playlist alternativa', 'success');
+                    return;
                 }
 
                 const spotifyData = await spotifyRes.json();
-                let musicas = processarSpotify(spotifyData, limite);
+                let musicas = processarSpotify(spotifyData, 50);
 
-                // 4. Enriquece com YouTube
+                // 5. Enriquece com YouTube
                 container.innerHTML = `
                     <div class="loading">
                         <div class="spinner"></div>
-                        <p>Enriquecendo com YouTube...</p>
-                        <p style="font-size:0.75rem;color:var(--text-muted);">${musicas.length} músicas encontradas</p>
+                        <p>Enriquecendo com YouTube (${musicas.length} músicas)...</p>
                     </div>
                 `;
 
                 musicas = await enriquecerYouTube(musicas);
 
-                // 5. Calcula Heat Score e ordena
-                musicas.forEach(m => {
-                    const spotifyScore = m.popularity;
-                    const youtubeScore = m.youtube_views ? Math.min(100, m.youtube_views / 1000000) : 0;
-                    m.heat_score = youtubeScore > 0 
-                        ? spotifyScore * 0.5 + youtubeScore * 0.5
-                        : spotifyScore;
-                    m.heat_score = Math.min(100, m.heat_score);
-                });
+                // 6. Filtra por mês
+                musicas = filtrarPorMes(musicas, mes);
 
-                musicas.sort((a, b) => b.heat_score - a.heat_score);
-                musicas.forEach((m, i) => m.rank = i + 1);
+                // 7. Calcula Heat Score
+                musicas = calcularHeatScore(musicas);
 
                 musicasAtuais = musicas.slice(0, limite);
 
-                // 6. Renderiza
+                // 8. Renderiza
                 renderizarResultados();
 
                 const generoNome = document.getElementById('genero').options[document.getElementById('genero').selectedIndex].text;
-                document.getElementById('results-title').textContent = `${generoNome} - ${regiao === 'brasil' ? '🇧🇷 Brasil' : '🌍 Global'}`;
+                const mesNome = mes > 0 ? document.getElementById('mes').options[document.getElementById('mes').selectedIndex].text : '';
+                document.getElementById('results-title').textContent = `${generoNome} ${mesNome ? '- ' + mesNome : ''} - ${regiao === 'brasil' ? '🇧🇷' : '🌍'}`;
                 document.getElementById('results-count').textContent = `${musicasAtuais.length} músicas`;
                 document.getElementById('btn-export').style.display = 'flex';
 
                 mostrarToast(`✅ ${musicasAtuais.length} músicas encontradas!`, 'success');
 
             } catch (error) {
-                console.error('Erro:', error);
+                console.error('Erro completo:', error);
                 mostrarErro(error.message);
             } finally {
                 btn.disabled = false;
@@ -802,17 +855,18 @@
         // ============================================================
         // PROCESSAR SPOTIFY
         // ============================================================
-        function processarSpotify(data, limite) {
+        function processarSpotify(data, max) {
             const musicas = [];
             const items = data.items || [];
 
-            for (let i = 0; i < Math.min(items.length, 50); i++) {
+            for (let i = 0; i < Math.min(items.length, max); i++) {
                 const track = items[i]?.track;
                 if (!track) continue;
 
                 const artistas = track.artists?.map(a => a.name).join(', ') || 'Desconhecido';
                 const imagens = track.album?.images || [];
                 const imagem = imagens[0]?.url || '';
+                const releaseDate = track.album?.release_date || '';
 
                 musicas.push({
                     rank: i + 1,
@@ -825,6 +879,9 @@
                     popularity: track.popularity || 0,
                     duration_ms: track.duration_ms || 0,
                     explicit: track.explicit || false,
+                    release_date: releaseDate,
+                    release_year: parseInt(releaseDate.split('-')[0]) || 0,
+                    release_month: parseInt(releaseDate.split('-')[1]) || 0,
                     youtube_views: null,
                     youtube_url: null,
                     heat_score: 0,
@@ -835,12 +892,30 @@
         }
 
         // ============================================================
+        // FILTRAR POR MÊS
+        // ============================================================
+        function filtrarPorMes(musicas, mes) {
+            if (mes === 0) return musicas; // Todos os meses
+
+            // Filtra músicas lançadas no mês selecionado
+            // Se não houver músicas do mês exato, retorna todas com aviso
+            const filtradas = musicas.filter(m => m.release_month === mes);
+
+            if (filtradas.length === 0) {
+                // Se não achou nenhuma do mês, mostra todas mas marca no toast depois
+                console.log('Nenhuma música do mês', mes, '- mostrando todas');
+                return musicas;
+            }
+
+            return filtradas;
+        }
+
+        // ============================================================
         // ENRIQUECER COM YOUTUBE
         // ============================================================
         async function enriquecerYouTube(musicas) {
             if (!YOUTUBE_API_KEY) return musicas;
 
-            // Processa em lotes de 3 (evita rate limit)
             for (let i = 0; i < musicas.length; i += 3) {
                 const batch = musicas.slice(i, i + 3);
                 const promises = batch.map(m => buscarYouTube(m.titulo, m.artista));
@@ -855,7 +930,6 @@
                     }
                 });
 
-                // Pequeno delay entre lotes
                 if (i + 3 < musicas.length) {
                     await new Promise(r => setTimeout(r, 300));
                 }
@@ -895,6 +969,25 @@
         }
 
         // ============================================================
+        // CALCULAR HEAT SCORE
+        // ============================================================
+        function calcularHeatScore(musicas) {
+            musicas.forEach(m => {
+                const spotifyScore = m.popularity;
+                const youtubeScore = m.youtube_views ? Math.min(100, m.youtube_views / 1000000) : 0;
+                m.heat_score = youtubeScore > 0 
+                    ? spotifyScore * 0.5 + youtubeScore * 0.5
+                    : spotifyScore;
+                m.heat_score = Math.min(100, m.heat_score);
+            });
+
+            musicas.sort((a, b) => b.heat_score - a.heat_score);
+            musicas.forEach((m, i) => m.rank = i + 1);
+
+            return musicas;
+        }
+
+        // ============================================================
         // RENDERIZAR
         // ============================================================
         function renderizarResultados() {
@@ -905,6 +998,7 @@
                     <div class="empty-state">
                         <div class="empty-state-icon">😕</div>
                         <h3>Nenhuma música encontrada</h3>
+                        <p>Tente outros filtros</p>
                     </div>
                 `;
                 return;
@@ -923,6 +1017,10 @@
             if (m.heat_sources.spotify !== undefined) metaTags += '<span class="meta-tag spotify">🎵 Spotify</span>';
             if (m.heat_sources.youtube !== undefined) metaTags += '<span class="meta-tag youtube">📺 YouTube</span>';
             if (m.explicit) metaTags += '<span class="meta-tag explicit">E</span>';
+            if (m.release_month > 0) {
+                const meses = ['','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+                metaTags += `<span class="meta-tag month">📅 ${meses[m.release_month]}/${m.release_year}</span>`;
+            }
 
             let youtubeInfo = '';
             if (m.youtube_views) {
@@ -952,7 +1050,7 @@
                         </div>
                     </div>
                     <div class="music-actions">
-                        <button class="action-btn ${m.preview_url ? '' : ''}" 
+                        <button class="action-btn" 
                                 onclick="togglePreview('${m.preview_url || ''}', this, '${m.titulo.replace(/'/g, "\'")}')"
                                 ${m.preview_url ? '' : 'disabled title="Sem preview"'}>
                             ${m.preview_url ? '▶️' : '🔇'}
@@ -1002,7 +1100,7 @@
 
             player.src = url;
             player.play().catch(e => {
-                mostrarToast('❌ Erro ao tocar preview', 'error');
+                mostrarToast('❌ Erro ao tocar', 'error');
                 btn.classList.remove('playing');
                 btn.innerHTML = '▶️';
                 btnPlayAtual = null;
@@ -1026,7 +1124,7 @@
         function exportarCSV() {
             if (!musicasAtuais.length) return;
 
-            const headers = ['Rank', 'Título', 'Artista', 'Álbum', 'Heat Score', 'Spotify Pop', 'YouTube Views', 'Duração(ms)', 'Spotify URL', 'YouTube URL'];
+            const headers = ['Rank', 'Título', 'Artista', 'Álbum', 'Heat Score', 'Spotify Pop', 'YouTube Views', 'Lançamento', 'Duração(ms)', 'Spotify URL', 'YouTube URL'];
             const rows = musicasAtuais.map(m => [
                 m.rank,
                 `"${m.titulo.replace(/"/g, '""')}"`,
@@ -1035,6 +1133,7 @@
                 m.heat_score,
                 m.popularity,
                 m.youtube_views || 0,
+                `"${m.release_date || ''}"`,
                 m.duration_ms,
                 m.spotify_url,
                 m.youtube_url || ''
@@ -1072,6 +1171,10 @@
                 <div class="error-box">
                     <h3>❌ Erro</h3>
                     <p>${msg}</p>
+                    <p style="margin-top:0.5rem;font-size:0.75rem;">
+                        💡 Dica: As playlists do Spotify mudam de ID periodicamente. 
+                        Tente selecionar "🔥 Todos (Tendências)" ou outro gênero.
+                    </p>
                 </div>
             `;
             mostrarToast(msg, 'error');
