@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎧 DJ Music Search</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-hover: #1a1a2e;
+            --border: #2a2a3e;
+            --primary: #1db954;
+            --primary-hover: #1ed760;
+            --accent: #ff6b35;
+            --accent-hot: #ff3366;
+            --youtube: #ff0000;
+            --text: #e0e0e0;
+            --text-muted: #888;
+            --text-dim: #555;
+            --success: #1db954;
+            --warning: #ffa500;
+            --danger: #ff3366;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%);
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo span { font-size: 0.85rem; font-weight: 500; color: var(--text-muted); -webkit-text-fill-color: var(--text-muted); }
+
+        .status-bar {
+            margin-left: auto;
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .status-dot.online { background: var(--success); box-shadow: 0 0 8px var(--success); }
+        .status-dot.offline { background: var(--danger); }
+        .status-dot.pending { background: var(--warning); }
+
+        .filters-section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .filters-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
+        }
+
+        .filter-group select {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-group select:hover { border-color: var(--primary); }
+        .filter-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(29, 185, 84, 0.1);
+        }
+
+        .btn-buscar {
+            background: linear-gradient(135deg, var(--primary), #169c46);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .btn-buscar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(29, 185, 84, 0.3);
+        }
+
+        .btn-buscar:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .quick-genres {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem 1rem;
+        }
+
+        .quick-genres-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .genre-chips {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .genre-chip {
+            padding: 0.4rem 0.8rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .genre-chip:hover {
+            background: var(--bg-hover);
+            border-color: var(--primary);
+        }
+
+        .genre-chip.active {
+            background: linear-gradient(135deg, var(--primary), #169c46);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .results-section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem 2rem;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .results-title { font-size: 1.1rem; font-weight: 700; }
+        .results-count { color: var(--text-muted); font-size: 0.8rem; }
+
+        .export-btn {
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .export-btn:hover {
+            border-color: var(--primary);
+            background: var(--bg-hover);
+        }
+
+        .music-list { display: flex; flex-direction: column; gap: 0.5rem; }
+
+        .music-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.8rem;
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .music-card:hover {
+            background: var(--bg-hover);
+            border-color: var(--primary);
+        }
+
+        .music-rank {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--text-dim);
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .music-rank.top3 { color: var(--accent); }
+
+        .music-cover {
+            width: 50px;
+            height: 50px;
+            border-radius: 6px;
+            object-fit: cover;
+            background: var(--bg-hover);
+            flex-shrink: 0;
+        }
+
+        .music-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .music-info h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.15rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .music-info p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .music-meta {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.3rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-tag {
+            font-size: 0.65rem;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .meta-tag.spotify { background: rgba(29, 185, 84, 0.15); color: #1db954; }
+        .meta-tag.youtube { background: rgba(255, 0, 0, 0.15); color: #ff4444; }
+        .meta-tag.explicit { background: rgba(255, 255, 255, 0.1); color: var(--text-muted); }
+
+        .heat-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.3rem;
+            min-width: 70px;
+        }
+
+        .heat-score-val {
+            font-size: 1rem;
+            font-weight: 800;
+        }
+
+        .heat-bar {
+            width: 50px;
+            height: 5px;
+            background: var(--bg-hover);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .heat-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .heat-fill.hot { background: linear-gradient(90deg, var(--accent-hot), var(--accent)); }
+        .heat-fill.warm { background: linear-gradient(90deg, var(--warning), var(--accent)); }
+        .heat-fill.cool { background: var(--primary); }
+
+        .music-actions {
+            display: flex;
+            gap: 0.3rem;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .action-btn.youtube:hover {
+            background: var(--youtube);
+            border-color: var(--youtube);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .action-btn.playing {
+            background: var(--accent-hot);
+            border-color: var(--accent-hot);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(255, 51, 102, 0); }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon { font-size: 3rem; margin-bottom: 0.5rem; opacity: 0.5; }
+
+        .error-box {
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid var(--danger);
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .error-box h3 { color: var(--danger); margin-bottom: 0.3rem; font-size: 0.9rem; }
+        .error-box p { color: var(--text-muted); font-size: 0.8rem; }
+
+        .toast {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            left: 1rem;
+            padding: 0.8rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transform: translateY(150px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+
+        .spotify-login-btn {
+            background: linear-gradient(135deg, var(--primary), #169c46);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 1rem 0;
+        }
+
+        @media (min-width: 768px) {
+            .header { padding: 2rem; }
+            .filters-section { padding: 1.5rem 2rem; }
+            .quick-genres { padding: 0 2rem 1.5rem; }
+            .results-section { padding: 0 2rem 3rem; }
+            .btn-buscar { width: auto; }
+            .music-card { padding: 1rem; }
+            .music-cover { width: 60px; height: 60px; }
+            .music-info h3 { font-size: 1rem; }
+            .toast { left: auto; max-width: 400px; }
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">🎧 DJ Music Search <span>Spotify + YouTube</span></div>
+            <div class="status-bar">
+                <span><span class="status-dot" id="spotify-status"></span> Spotify</span>
+                <span><span class="status-dot" id="youtube-status"></span> YouTube</span>
+            </div>
+        </div>
+    </header>
+
+    <section class="filters-section">
+        <div class="filters-grid">
+            <div class="filter-group">
+                <label>🎵 Gênero</label>
+                <select id="genero">
+                    <option value="todos">🔥 Todos</option>
+                    <option value="sertanejo">🤠 Sertanejo</option>
+                    <option value="funk">🎧 Funk</option>
+                    <option value="pagode">🥁 Pagode</option>
+                    <option value="forro">🪗 Forró</option>
+                    <option value="trap_br">🎤 Trap BR</option>
+                    <option value="pop_br">⭐ Pop BR</option>
+                    <option value="rock_br">🎸 Rock BR</option>
+                    <option value="eletronica">🎛️ Eletrônica</option>
+                    <option value="reggaeton">🌴 Reggaeton</option>
+                    <option value="rap_br">🎤 Rap BR</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>📅 Ano</label>
+                <select id="ano">
+                    <option value="2026">2026</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>🌍 Região</label>
+                <select id="regiao">
+                    <option value="brasil">🇧🇷 Brasil</option>
+                    <option value="global">🌍 Global</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>📊 Quantidade</label>
+                <select id="limite">
+                    <option value="10">Top 10</option>
+                    <option value="20">Top 20</option>
+                    <option value="30" selected>Top 30</option>
+                    <option value="50">Top 50</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn-buscar" id="btn-buscar" onclick="buscarMusicas()">
+            🔍 Buscar Músicas
+        </button>
+    </section>
+
+    <section class="quick-genres">
+        <div class="quick-genres-title">⚡ Acesso Rápido</div>
+        <div class="genre-chips" id="genre-chips"></div>
+    </section>
+
+    <section class="results-section">
+        <div class="results-header">
+            <div>
+                <h2 class="results-title" id="results-title">🎵 Resultados</h2>
+                <span class="results-count" id="results-count"></span>
+            </div>
+            <button class="export-btn" onclick="exportarCSV()" id="btn-export" style="display:none;">
+                📥 CSV
+            </button>
+        </div>
+        <div id="results-container">
+            <div class="empty-state">
+                <div class="empty-state-icon">🎧</div>
+                <h3>Clique em "Buscar Músicas"</h3>
+                <p>As músicas mais populares do Brasil e do mundo</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="toast" id="toast">
+        <span id="toast-icon">✅</span>
+        <span id="toast-message">Mensagem</span>
+    </div>
+
+    <audio id="audio-player" preload="none"></audio>
+
+    <script>
+        // ============================================================
+        // CONFIGURAÇÃO DAS APIs
+        // ============================================================
+        const SPOTIFY_CLIENT_ID = '9b97a651d1f14f02bb0d9e6492504f02';
+        const SPOTIFY_CLIENT_SECRET = 'fa6234e65cfd4ca8b96e939fbd7de02e';
+        const YOUTUBE_API_KEY = 'AIzaSyBjP9dxFEp09DpZl5JkVMD05uaKoQTNDpE';
+
+        // Token do Spotify (renova automaticamente)
+        let spotifyToken = null;
+        let tokenExpiry = 0;
+
+        // ============================================================
+        // PLAYLISTS
+        // ============================================================
+        const PLAYLISTS = {
+            brasil: { top50: '37i9dQZEVXbMXbN3EUUhlg', viral: '37i9dQZEVXbKzoK95AbRy4' },
+            global: { top50: '37i9dQZEVXbMDoHDwVN2tF', viral: '37i9dQZEVXbLiRSasKsNUA' },
+            generos_br: {
+                sertanejo: '37i9dQZF1DXdSjVZQ8fMXW',
+                funk: '37i9dQZF1DX4o1c7v7tV7Q',
+                pagode: '37i9dQZF1DX09uH9rQ6q0G',
+                forro: '37i9dQZF1DX7bSIS915W1W',
+                trap_br: '37i9dQZF1DX6R7QUWePReA',
+                pop_br: '37i9dQZF1DWVg3d2IaLMOo',
+                rock_br: '37i9dQZF1DWWwF0YdHGBe8',
+                eletronica: '37i9dQZF1DX8xEkwUKRSpg',
+                reggaeton: '37i9dQZF1DWY7IeEB1Hm1g',
+                rap_br: '37i9dQZF1DX2RLy1EYq5mM',
+            }
+        };
+
+        let musicasAtuais = [];
+        let btnPlayAtual = null;
+
+        // ============================================================
+        // INICIALIZAÇÃO
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarGenerosRapidos();
+            verificarStatusAPIs();
+        });
+
+        async function verificarStatusAPIs() {
+            try {
+                // Testa Spotify
+                const token = await getSpotifyToken();
+                setStatus('spotify-status', !!token);
+            } catch (e) {
+                setStatus('spotify-status', false);
+            }
+
+            // YouTube sempre "ok" se temos chave
+            setStatus('youtube-status', !!YOUTUBE_API_KEY);
+        }
+
+        function setStatus(id, online) {
+            const el = document.getElementById(id);
+            if (el) el.className = 'status-dot ' + (online ? 'online' : 'offline');
+        }
+
+        // ============================================================
+        // TOKEN SPOTIFY
+        // ============================================================
+        async function getSpotifyToken() {
+            const agora = Date.now();
+            if (spotifyToken && agora < tokenExpiry) {
+                return spotifyToken;
+            }
+
+            try {
+                const response = await fetch('https://accounts.spotify.com/api/token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Authorization': 'Basic ' + btoa(SPOTIFY_CLIENT_ID + ':' + SPOTIFY_CLIENT_SECRET)
+                    },
+                    body: 'grant_type=client_credentials'
+                });
+
+                const data = await response.json();
+
+                if (data.access_token) {
+                    spotifyToken = data.access_token;
+                    tokenExpiry = agora + (data.expires_in * 1000) - 60000; // 1 min antes de expirar
+                    return spotifyToken;
+                }
+                return null;
+            } catch (e) {
+                console.error('Erro ao obter token Spotify:', e);
+                return null;
+            }
+        }
+
+        // ============================================================
+        // GÊNEROS RÁPIDOS
+        // ============================================================
+        function carregarGenerosRapidos() {
+            const generos = [
+                { id: 'todos', nome: '🔥 Tendências' },
+                { id: 'sertanejo', nome: '🤠 Sertanejo' },
+                { id: 'funk', nome: '🎧 Funk' },
+                { id: 'pagode', nome: '🥁 Pagode' },
+                { id: 'trap_br', nome: '🎤 Trap' },
+                { id: 'pop_br', nome: '⭐ Pop' },
+                { id: 'eletronica', nome: '🎛️ EDM' },
+                { id: 'reggaeton', nome: '🌴 Reggaeton' },
+            ];
+
+            const container = document.getElementById('genre-chips');
+            container.innerHTML = generos.map(g => 
+                `<button class="genre-chip" onclick="selecionarGenero('${g.id}', this)">${g.nome}</button>`
+            ).join('');
+        }
+
+        function selecionarGenero(genero, btn) {
+            document.getElementById('genero').value = genero;
+            document.querySelectorAll('.genre-chip').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            buscarMusicas();
+        }
+
+        // ============================================================
+        // BUSCAR MÚSICAS
+        // ============================================================
+        async function buscarMusicas() {
+            const btn = document.getElementById('btn-buscar');
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Buscando...';
+
+            const genero = document.getElementById('genero').value;
+            const ano = document.getElementById('ano').value;
+            const regiao = document.getElementById('regiao').value;
+            const limite = parseInt(document.getElementById('limite').value);
+
+            const container = document.getElementById('results-container');
+            container.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Buscando no Spotify...</p>
+                </div>
+            `;
+
+            try {
+                // 1. Pega token
+                const token = await getSpotifyToken();
+                if (!token) {
+                    throw new Error('Não foi possível conectar ao Spotify. Verifique as credenciais.');
+                }
+
+                setStatus('spotify-status', true);
+
+                // 2. Define playlist
+                let playlistId;
+                if (genero === 'todos') {
+                    playlistId = PLAYLISTS[regiao]?.top50;
+                } else {
+                    playlistId = PLAYLISTS.generos_br[genero];
+                    if (!playlistId) playlistId = PLAYLISTS[regiao]?.top50;
+                }
+
+                if (!playlistId) {
+                    throw new Error('Playlist não encontrada para este gênero/região.');
+                }
+
+                // 3. Busca no Spotify
+                const spotifyRes = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=50`, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+
+                if (!spotifyRes.ok) {
+                    const err = await spotifyRes.json();
+                    throw new Error(err.error?.message || 'Erro no Spotify');
+                }
+
+                const spotifyData = await spotifyRes.json();
+                let musicas = processarSpotify(spotifyData, limite);
+
+                // 4. Enriquece com YouTube
+                container.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Enriquecendo com YouTube...</p>
+                        <p style="font-size:0.75rem;color:var(--text-muted);">${musicas.length} músicas encontradas</p>
+                    </div>
+                `;
+
+                musicas = await enriquecerYouTube(musicas);
+
+                // 5. Calcula Heat Score e ordena
+                musicas.forEach(m => {
+                    const spotifyScore = m.popularity;
+                    const youtubeScore = m.youtube_views ? Math.min(100, m.youtube_views / 1000000) : 0;
+                    m.heat_score = youtubeScore > 0 
+                        ? spotifyScore * 0.5 + youtubeScore * 0.5
+                        : spotifyScore;
+                    m.heat_score = Math.min(100, m.heat_score);
+                });
+
+                musicas.sort((a, b) => b.heat_score - a.heat_score);
+                musicas.forEach((m, i) => m.rank = i + 1);
+
+                musicasAtuais = musicas.slice(0, limite);
+
+                // 6. Renderiza
+                renderizarResultados();
+
+                const generoNome = document.getElementById('genero').options[document.getElementById('genero').selectedIndex].text;
+                document.getElementById('results-title').textContent = `${generoNome} - ${regiao === 'brasil' ? '🇧🇷 Brasil' : '🌍 Global'}`;
+                document.getElementById('results-count').textContent = `${musicasAtuais.length} músicas`;
+                document.getElementById('btn-export').style.display = 'flex';
+
+                mostrarToast(`✅ ${musicasAtuais.length} músicas encontradas!`, 'success');
+
+            } catch (error) {
+                console.error('Erro:', error);
+                mostrarErro(error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🔍 Buscar Músicas';
+            }
+        }
+
+        // ============================================================
+        // PROCESSAR SPOTIFY
+        // ============================================================
+        function processarSpotify(data, limite) {
+            const musicas = [];
+            const items = data.items || [];
+
+            for (let i = 0; i < Math.min(items.length, 50); i++) {
+                const track = items[i]?.track;
+                if (!track) continue;
+
+                const artistas = track.artists?.map(a => a.name).join(', ') || 'Desconhecido';
+                const imagens = track.album?.images || [];
+                const imagem = imagens[0]?.url || '';
+
+                musicas.push({
+                    rank: i + 1,
+                    titulo: track.name || 'Desconhecido',
+                    artista: artistas,
+                    album: track.album?.name || '',
+                    imagem: imagem,
+                    preview_url: track.preview_url,
+                    spotify_url: track.external_urls?.spotify || '',
+                    popularity: track.popularity || 0,
+                    duration_ms: track.duration_ms || 0,
+                    explicit: track.explicit || false,
+                    youtube_views: null,
+                    youtube_url: null,
+                    heat_score: 0,
+                    heat_sources: { spotify: track.popularity || 0 }
+                });
+            }
+            return musicas;
+        }
+
+        // ============================================================
+        // ENRIQUECER COM YOUTUBE
+        // ============================================================
+        async function enriquecerYouTube(musicas) {
+            if (!YOUTUBE_API_KEY) return musicas;
+
+            // Processa em lotes de 3 (evita rate limit)
+            for (let i = 0; i < musicas.length; i += 3) {
+                const batch = musicas.slice(i, i + 3);
+                const promises = batch.map(m => buscarYouTube(m.titulo, m.artista));
+                const results = await Promise.allSettled(promises);
+
+                results.forEach((result, idx) => {
+                    if (result.status === 'fulfilled' && result.value) {
+                        const m = batch[idx];
+                        m.youtube_views = result.value.views;
+                        m.youtube_url = result.value.url;
+                        m.heat_sources.youtube = Math.min(100, result.value.views / 100000);
+                    }
+                });
+
+                // Pequeno delay entre lotes
+                if (i + 3 < musicas.length) {
+                    await new Promise(r => setTimeout(r, 300));
+                }
+            }
+
+            return musicas;
+        }
+
+        async function buscarYouTube(titulo, artista) {
+            try {
+                const query = encodeURIComponent(`${titulo} ${artista} official`);
+                const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=id&q=${query}&type=video&maxResults=1&key=${YOUTUBE_API_KEY}`;
+
+                const searchRes = await fetch(searchUrl);
+                if (!searchRes.ok) return null;
+
+                const searchData = await searchRes.json();
+                if (!searchData.items?.length) return null;
+
+                const videoId = searchData.items[0].id.videoId;
+
+                const statsUrl = `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoId}&key=${YOUTUBE_API_KEY}`;
+                const statsRes = await fetch(statsUrl);
+                if (!statsRes.ok) return null;
+
+                const statsData = await statsRes.json();
+                if (!statsData.items?.length) return null;
+
+                const stats = statsData.items[0].statistics;
+                return {
+                    views: parseInt(stats.viewCount || 0),
+                    url: `https://youtube.com/watch?v=${videoId}`
+                };
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // ============================================================
+        // RENDERIZAR
+        // ============================================================
+        function renderizarResultados() {
+            const container = document.getElementById('results-container');
+
+            if (!musicasAtuais.length) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">😕</div>
+                        <h3>Nenhuma música encontrada</h3>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `<div class="music-list">${musicasAtuais.map((m, i) => renderizarCard(m, i)).join('')}</div>`;
+        }
+
+        function renderizarCard(m, index) {
+            const isTop3 = index < 3;
+            const rankClass = isTop3 ? 'top3' : '';
+            const heatClass = m.heat_score >= 80 ? 'hot' : m.heat_score >= 50 ? 'warm' : 'cool';
+            const duracao = formatarDuracao(m.duration_ms);
+
+            let metaTags = '';
+            if (m.heat_sources.spotify !== undefined) metaTags += '<span class="meta-tag spotify">🎵 Spotify</span>';
+            if (m.heat_sources.youtube !== undefined) metaTags += '<span class="meta-tag youtube">📺 YouTube</span>';
+            if (m.explicit) metaTags += '<span class="meta-tag explicit">E</span>';
+
+            let youtubeInfo = '';
+            if (m.youtube_views) {
+                youtubeInfo = `<span style="color:var(--youtube);font-size:0.7rem;">📺 ${formatarNumero(m.youtube_views)}</span>`;
+            }
+
+            return `
+                <div class="music-card">
+                    <div class="music-rank ${rankClass}">${m.rank}</div>
+                    <img src="${m.imagem || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}" 
+                         alt="${m.titulo}" class="music-cover" loading="lazy" onerror="this.style.display='none'">
+                    <div class="music-info">
+                        <h3>${m.titulo}</h3>
+                        <p>${m.artista}</p>
+                        <div class="music-meta">
+                            ${metaTags}
+                            ${youtubeInfo}
+                            <span style="color:var(--text-dim);font-size:0.7rem;">${duracao}</span>
+                        </div>
+                    </div>
+                    <div class="heat-section">
+                        <div class="heat-score-val" style="color: ${m.heat_score >= 80 ? 'var(--accent-hot)' : m.heat_score >= 50 ? 'var(--warning)' : 'var(--primary)'}">
+                            ${Math.round(m.heat_score)}
+                        </div>
+                        <div class="heat-bar">
+                            <div class="heat-fill ${heatClass}" style="width: ${m.heat_score}%"></div>
+                        </div>
+                    </div>
+                    <div class="music-actions">
+                        <button class="action-btn ${m.preview_url ? '' : ''}" 
+                                onclick="togglePreview('${m.preview_url || ''}', this, '${m.titulo.replace(/'/g, "\'")}')"
+                                ${m.preview_url ? '' : 'disabled title="Sem preview"'}>
+                            ${m.preview_url ? '▶️' : '🔇'}
+                        </button>
+                        <button class="action-btn" onclick="window.open('${m.spotify_url}', '_blank')" title="Spotify">🎵</button>
+                        ${m.youtube_url ? `<button class="action-btn youtube" onclick="window.open('${m.youtube_url}', '_blank')" title="YouTube">📺</button>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function formatarDuracao(ms) {
+            const min = Math.floor(ms / 60000);
+            const seg = Math.floor((ms % 60000) / 1000);
+            return `${min}:${seg.toString().padStart(2, '0')}`;
+        }
+
+        function formatarNumero(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toString();
+        }
+
+        // ============================================================
+        // PLAYER
+        // ============================================================
+        function togglePreview(url, btn, titulo) {
+            const player = document.getElementById('audio-player');
+
+            if (!url) {
+                mostrarToast('❌ Preview indisponível', 'error');
+                return;
+            }
+
+            if (btnPlayAtual === btn && !player.paused) {
+                player.pause();
+                btn.classList.remove('playing');
+                btn.innerHTML = '▶️';
+                btnPlayAtual = null;
+                return;
+            }
+
+            if (btnPlayAtual) {
+                btnPlayAtual.classList.remove('playing');
+                btnPlayAtual.innerHTML = '▶️';
+            }
+
+            player.src = url;
+            player.play().catch(e => {
+                mostrarToast('❌ Erro ao tocar preview', 'error');
+                btn.classList.remove('playing');
+                btn.innerHTML = '▶️';
+                btnPlayAtual = null;
+                return;
+            });
+
+            btn.classList.add('playing');
+            btn.innerHTML = '⏸️';
+            btnPlayAtual = btn;
+
+            player.onended = () => {
+                btn.classList.remove('playing');
+                btn.innerHTML = '▶️';
+                btnPlayAtual = null;
+            };
+        }
+
+        // ============================================================
+        // EXPORTAR CSV
+        // ============================================================
+        function exportarCSV() {
+            if (!musicasAtuais.length) return;
+
+            const headers = ['Rank', 'Título', 'Artista', 'Álbum', 'Heat Score', 'Spotify Pop', 'YouTube Views', 'Duração(ms)', 'Spotify URL', 'YouTube URL'];
+            const rows = musicasAtuais.map(m => [
+                m.rank,
+                `"${m.titulo.replace(/"/g, '""')}"`,
+                `"${m.artista.replace(/"/g, '""')}"`,
+                `"${(m.album || '').replace(/"/g, '""')}"`,
+                m.heat_score,
+                m.popularity,
+                m.youtube_views || 0,
+                m.duration_ms,
+                m.spotify_url,
+                m.youtube_url || ''
+            ]);
+
+            const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `setlist_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+
+            mostrarToast('📥 CSV exportado!', 'success');
+        }
+
+        // ============================================================
+        // UTILS
+        // ============================================================
+        function mostrarToast(mensagem, tipo) {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            const msg = document.getElementById('toast-message');
+
+            toast.className = 'toast ' + tipo;
+            icon.textContent = tipo === 'success' ? '✅' : '❌';
+            msg.textContent = mensagem;
+
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function mostrarErro(msg) {
+            document.getElementById('results-container').innerHTML = `
+                <div class="error-box">
+                    <h3>❌ Erro</h3>
+                    <p>${msg}</p>
+                </div>
+            `;
+            mostrarToast(msg, 'error');
+        }
+    </script>
+</body>
+</html>
