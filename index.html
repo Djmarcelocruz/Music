@@ -1,30 +1,1101 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Top Músicas - DJ Marcelo</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>HitRegio DJ – Versão Otimizada</title>
+  <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22HitRegio%20DJ%22%2C%22short_name%22%3A%22HitRegio%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23121212%22%2C%22theme_color%22%3A%22%23ff6600%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ccircle%20cx%3D'50'%20cy%3D'50'%20r%3D'50'%20fill%3D'%23ff6600'%2F%3E%3Ctext%20x%3D'50'%20y%3D'65'%20text-anchor%3D'middle'%20fill%3D'white'%20font-size%3D'40'%3E%E2%99%AB%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22100x100%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #eee; padding: 16px; transition: background 0.3s; }
+    body.light { background: #f5f5f5; color: #121212; }
+    .app { max-width: 800px; margin: 0 auto; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    h1 { color: #ff6600; font-size: 1.8rem; }
+    .config-bar { background: #1e1e1e; border-radius: 20px; padding: 12px; margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    body.light .config-bar { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .config-bar input, .config-bar button { padding: 8px 12px; border-radius: 20px; border: none; background: #2c2c2c; color: #fff; font-size: 0.85rem; }
+    body.light .config-bar input { background: #f0f0f0; color: #121212; border: 1px solid #ccc; }
+    .config-bar button { background: #ff6600; font-weight: bold; cursor: pointer; }
+    .search-section { background: #1e1e1e; border-radius: 20px; padding: 16px; margin-bottom: 16px; }
+    body.light .search-section { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .search-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .search-row input { flex: 1; min-width: 150px; padding: 10px; border-radius: 30px; border: none; background: #2c2c2c; color: #fff; }
+    body.light .search-row input { background: #f0f0f0; color: #121212; border: 1px solid #ccc; }
+    .search-row button { padding: 10px 16px; border-radius: 30px; border: none; font-weight: bold; cursor: pointer; }
+    .btn-primary { background: #ff6600; color: #fff; }
+    .btn-remix { background: #9c27b0; color: #fff; }
+    .btn-hits { background: #e63946; color: #fff; }
+    .btn-voice { background: #2196f3; color: #fff; padding: 10px 14px; }
+    .occasion-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+    .occasion-btn { flex: 1; min-width: 70px; padding: 10px 6px; border-radius: 20px; border: none; background: #3a3a3a; color: #fff; font-size: 0.8rem; cursor: pointer; }
+    .occasion-btn:hover, .occasion-btn.active { background: #ff6600; }
+    .filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; align-items: center; }
+    .filter-row select, .filter-row input { padding: 6px 12px; border-radius: 20px; border: none; background: #2c2c2c; color: #fff; }
+    body.light .filter-row select, body.light .filter-row input { background: #f0f0f0; color: #121212; border: 1px solid #ccc; }
+    .filter-row label { display: flex; align-items: center; gap: 4px; font-size: 0.8rem; }
+    .history-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .history-item { background: #2c2c2c; padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; cursor: pointer; }
+    .tab-bar { display: flex; gap: 4px; margin-bottom: 16px; background: #1e1e1e; border-radius: 40px; padding: 4px; }
+    .tab { flex: 1; text-align: center; padding: 10px; border-radius: 30px; background: #2c2c2c; cursor: pointer; font-weight: bold; }
+    .tab.active { background: #ff6600; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .music-card { background: #1e1e1e; border-radius: 20px; padding: 16px; margin-bottom: 12px; border-left: 5px solid #ff6600; transition: 0.2s; }
+    body.light .music-card { background: #fff; border: 1px solid #ddd; }
+    .music-card.hidden-filter { display: none; }
+    .music-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+    .music-title { font-size: 1.1rem; font-weight: bold; }
+    .music-artist { color: #aaa; font-size: 0.9rem; margin: 2px 0; }
+    .music-meta { display: flex; gap: 8px; flex-wrap: wrap; font-size: 0.7rem; margin: 4px 0; }
+    .music-meta .badge { background: #2c2c2c; padding: 2px 8px; border-radius: 12px; }
+    .bpm-badge { background: #ff6600; color: #000; }
+    .camelot-badge { background: #9b59b6; color: #fff; }
+    .energy-bar { width: 50px; height: 4px; background: #444; border-radius: 2px; display: inline-block; margin-left: 4px; }
+    .energy-fill { height: 100%; border-radius: 2px; }
+    .energy-low { background: #4caf50; }
+    .energy-mid { background: #ff9800; }
+    .energy-high { background: #ff5722; }
+    .music-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .music-actions button { padding: 8px 14px; border-radius: 20px; border: none; background: #2c2c2c; color: #fff; font-size: 0.8rem; cursor: pointer; min-height: 36px; }
+    .music-actions .fav-active { background: #e63946; }
+    .note-input { width: 100%; padding: 6px; border-radius: 10px; border: none; background: #2c2c2c; color: #fff; font-size: 0.8rem; margin-top: 8px; }
+    body.light .note-input { background: #f0f0f0; color: #121212; border: 1px solid #ccc; }
+    .suggestion-box { margin-top: 6px; padding: 8px; background: #2c2c2c; border-radius: 10px; font-size: 0.8rem; max-height: 200px; overflow-y: auto; }
+    .player-panel { position: sticky; bottom: 10px; background: #1e1e1e; border-radius: 20px; padding: 12px; margin-top: 10px; backdrop-filter: blur(5px); display: none; z-index: 10; }
+    .player-controls { display: flex; flex-direction: column; gap: 8px; }
+    .player-main { display: flex; align-items: center; gap: 10px; }
+    .player-cover { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; }
+    .player-info { flex: 1; min-width: 0; }
+    .player-title { font-size: 0.9rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .player-artist { font-size: 0.75rem; color: #aaa; }
+    .player-progress { width: 100%; height: 5px; background: #444; border-radius: 3px; cursor: pointer; margin: 4px 0; }
+    .player-progress-fill { height: 100%; background: #ff6600; border-radius: 3px; width: 0%; }
+    .player-time { font-size: 0.65rem; color: #aaa; display: flex; justify-content: space-between; }
+    .player-buttons { display: flex; gap: 8px; align-items: center; }
+    .player-buttons button { background: #2c2c2c; border: none; color: #fff; font-size: 1.3rem; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .volume-slider { width: 80px; accent-color: #ff6600; }
+    .queue-list { max-height: 120px; overflow-y: auto; font-size: 0.7rem; margin-top: 4px; }
+    .queue-item { padding: 2px 4px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; }
+    .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 30px; z-index: 999; font-size: 0.9rem; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+    .toast.show { opacity: 1; }
+    .spinner { display: none; text-align: center; padding: 20px; }
+    .spinner::after { content: ''; display: inline-block; width: 30px; height: 30px; border: 3px solid #ff6600; border-top: 3px solid transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .pull-indicator { text-align: center; color: #ff6600; font-size: 0.8rem; display: none; }
+    @media (max-width: 500px) { .search-row input { min-width: 100px; } .occasion-btn { font-size: 0.65rem; padding: 8px 4px; } }
+  </style>
 </head>
 <body>
-  <h1>🎶 Ranking de Músicas</h1>
+<div class="app">
+  <header>
+    <h1>🎧 HitRegio</h1>
+    <button id="themeToggle" style="background:#555; border:none; border-radius:20px; padding:6px 12px; color:#fff; cursor:pointer;">🌓</button>
+  </header>
 
-  <label for="genre">Estilo:</label>
-  <select id="genre">
-    <option value="pop">Pop</option>
-    <option value="funk">Funk</option>
-    <option value="hip-hop">Hip-Hop</option>
-    <option value="sertanejo">Sertanejo</option>
-    <option value="eletronica">Eletrônica</option>
-  </select>
+  <!-- Barra de configuração (apenas chaves públicas) -->
+  <div class="config-bar" id="configBar">
+    <input type="text" id="spotifyClientId" placeholder="Spotify Client ID" style="flex:2;">
+    <input type="text" id="youtubeApiKey" placeholder="YouTube API Key (opcional)" style="flex:1;">
+    <button id="saveKeysBtn">Salvar</button>
+    <button id="spotifyLoginBtn" style="background:#1DB954; color:#fff; display:none;">🔐 Login Spotify</button>
+    <span id="keysStatus" style="font-size:0.7rem; color:#aaa;"></span>
+  </div>
 
-  <label for="month">Mês:</label>
-  <input type="month" id="month">
+  <!-- Seção de busca -->
+  <div class="search-section">
+    <div class="search-row">
+      <input type="text" id="searchInput" placeholder="Artista, música ou gênero..." autocomplete="off">
+      <button id="voiceBtn" class="btn-voice">🎤</button>
+      <button id="searchBtn" class="btn-primary">Buscar</button>
+      <button id="remixBtn" class="btn-remix">🎛️ Remix</button>
+      <button id="hitsBtn" class="btn-hits">🔥 Top 50</button>
+    </div>
+    <div class="occasion-row">
+      <button class="occasion-btn" data-occ="casamento">💒 Casamento</button>
+      <button class="occasion-btn" data-occ="balada">🪩 Balada</button>
+      <button class="occasion-btn" data-occ="barzinho">🍺 Barzinho</button>
+      <button class="occasion-btn" data-occ="formatura">🎓 Formatura</button>
+    </div>
+    <div class="filter-row">
+      <select id="genreSelect"><option value="">Todos</option><option value="funk">Funk</option><option value="sertanejo">Sertanejo</option><option value="eletronica">Eletrônica</option><option value="axé">Axé</option><option value="forro">Forró</option><option value="pagode">Pagode</option><option value="rock">Rock</option></select>
+      <label><input type="checkbox" id="recentOnly"> 🔁 Só 90d</label>
+      <select id="durationFilter"><option value="all">Duração</option><option value="short">&lt;3min</option><option value="medium">3-5min</option><option value="long">&gt;5min</option></select>
+      <input type="number" id="bpmMin" placeholder="BPM min" style="width:60px;">
+      <input type="number" id="bpmMax" placeholder="BPM max" style="width:60px;">
+      <button id="applyBpmFilter" style="background:#3a3a3a; padding:4px 10px;">Filtrar BPM</button>
+    </div>
+    <div class="history-row" id="historyList"></div>
+  </div>
 
-  <button onclick="buscarMusicas()">Buscar</button>
+  <!-- Abas -->
+  <div class="tab-bar">
+    <div class="tab active" data-tab="resultsTab">🎵 Resultados</div>
+    <div class="tab" data-tab="favoritesTab">❤️ Favoritos</div>
+    <div class="tab" data-tab="suggestionsTab">🧠 Sugestões</div>
+  </div>
 
-  <h2>Resultados</h2>
-  <ul id="lista"></ul>
+  <div id="resultsTab" class="panel active">
+    <div class="spinner" id="searchSpinner"></div>
+    <div id="suggestions"></div>
+    <div id="results"></div>
+    <div class="load-more"><button id="loadMoreBtn" style="display:none;">➕ Carregar mais</button></div>
+    <div style="display:flex; gap:6px; margin-top:10px; flex-wrap:wrap;">
+      <button id="exportTxt" style="background:#3498db;">📋 TXT</button>
+      <button id="exportCsv" style="background:#2ecc71;">📊 CSV</button>
+      <button id="exportM3u" style="background:#e67e22;">📁 M3U</button>
+      <button id="exportXml" style="background:#9b59b6;">📂 XML</button>
+      <button id="sharePlaylistBtn" style="background:#e91e63;">🔗 Compartilhar</button>
+      <button id="spotifyPlaylistBtn" style="background:#1DB954; color:#fff;">➕ Criar playlist Spotify</button>
+      <button id="youtubePlaylistBtn" style="background:#FF0000; color:#fff;">▶ Abrir no YouTube</button>
+    </div>
+  </div>
+  <div id="favoritesTab" class="panel"><div id="favoritesList"></div><button id="clearFavs" style="background:#555; padding:6px 16px; border-radius:20px; border:none; color:#fff; margin-top:8px;">🗑️ Limpar</button></div>
+  <div id="suggestionsTab" class="panel"><div id="suggestionsList"></div></div>
 
-  <script src="app.js"></script>
+  <!-- Player sticky -->
+  <div class="player-panel" id="playerPanel">
+    <div class="player-controls">
+      <div class="player-main">
+        <img id="playerCover" class="player-cover" src="" alt="capa">
+        <div class="player-info">
+          <div class="player-title" id="playerTitle">Título</div>
+          <div class="player-artist" id="playerArtist">Artista</div>
+          <div class="player-progress" id="progressBar"><div class="player-progress-fill" id="progressFill"></div></div>
+          <div class="player-time"><span id="currentTime">0:00</span><span id="durationTime">0:00</span></div>
+        </div>
+      </div>
+      <div class="player-buttons">
+        <button id="prevBtn">⏮</button>
+        <button id="playPauseBtn">⏸</button>
+        <button id="nextBtn">⏭</button>
+        <button id="stopPlayerBtn">⏹</button>
+        <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.05" value="1" title="Volume">
+      </div>
+      <div class="queue-list" id="queueList" style="display:none;"></div>
+    </div>
+  </div>
+  <div id="status" class="status"></div>
+  <div class="toast" id="toast"></div>
+  <div class="pull-indicator" id="pullIndicator">↻ Solte para atualizar</div>
+</div>
+
+<script>
+  (function() {
+    // ==================== CONFIGURAÇÃO ====================
+    const SPOTIFY_CLIENT_ID_KEY = 'spotify_client_id';
+    const YOUTUBE_API_KEY_KEY = 'youtube_api_key';
+    const SPOTIFY_REDIRECT_URI = window.location.origin + window.location.pathname;
+
+    // Estado global
+    let spotifyClientId = '';
+    let youtubeApiKey = '';
+    let spotifyToken = null, tokenExpiry = 0, spotifyRefreshToken = null;
+    let currentTracks = [], originalTracks = [], currentQuery = '', currentOffset = 0;
+    let audio = null, isSequential = false, seqIndex = 0, playerQueue = [];
+    let favorites = JSON.parse(localStorage.getItem('hitregio_favorites') || '[]');
+    let searchHistory = JSON.parse(localStorage.getItem('hitregio_history') || '[]');
+    let customBpm = JSON.parse(localStorage.getItem('hitregio_custom_bpm') || '{}');
+    let notes = JSON.parse(localStorage.getItem('hitregio_notes') || '{}');
+    let currentPlayerTrack = null, isPlaying = false;
+    let sortType = 'popularity';
+    let searchCache = new Map();
+    let wakeLock = null;
+
+    // ==================== DOM ELEMENTS ====================
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => document.querySelectorAll(sel);
+
+    const elements = {
+      spotifyClientId: $('#spotifyClientId'),
+      youtubeApiKey: $('#youtubeApiKey'),
+      saveKeysBtn: $('#saveKeysBtn'),
+      spotifyLoginBtn: $('#spotifyLoginBtn'),
+      keysStatus: $('#keysStatus'),
+      searchInput: $('#searchInput'),
+      searchBtn: $('#searchBtn'),
+      remixBtn: $('#remixBtn'),
+      hitsBtn: $('#hitsBtn'),
+      voiceBtn: $('#voiceBtn'),
+      results: $('#results'),
+      loadMoreBtn: $('#loadMoreBtn'),
+      searchSpinner: $('#searchSpinner'),
+      historyList: $('#historyList'),
+      favoritesList: $('#favoritesList'),
+      suggestionsList: $('#suggestionsList'),
+      playerPanel: $('#playerPanel'),
+      playerTitle: $('#playerTitle'),
+      playerArtist: $('#playerArtist'),
+      playerCover: $('#playerCover'),
+      progressBar: $('#progressBar'),
+      progressFill: $('#progressFill'),
+      currentTime: $('#currentTime'),
+      durationTime: $('#durationTime'),
+      playPauseBtn: $('#playPauseBtn'),
+      stopPlayerBtn: $('#stopPlayerBtn'),
+      prevBtn: $('#prevBtn'),
+      nextBtn: $('#nextBtn'),
+      volumeSlider: $('#volumeSlider'),
+      queueList: $('#queueList'),
+      status: $('#status'),
+      toast: $('#toast'),
+      pullIndicator: $('#pullIndicator'),
+      genreSelect: $('#genreSelect'),
+      recentOnly: $('#recentOnly'),
+      durationFilter: $('#durationFilter'),
+      bpmMin: $('#bpmMin'),
+      bpmMax: $('#bpmMax'),
+      applyBpmFilter: $('#applyBpmFilter'),
+      themeToggle: $('#themeToggle'),
+      sharePlaylistBtn: $('#sharePlaylistBtn'),
+      spotifyPlaylistBtn: $('#spotifyPlaylistBtn'),
+      youtubePlaylistBtn: $('#youtubePlaylistBtn'),
+      clearFavs: $('#clearFavs'),
+      tabButtons: $$('.tab'),
+      panels: $$('.panel'),
+      occasionBtns: $$('.occasion-btn'),
+    };
+
+    // ==================== UTILITÁRIOS ====================
+    const keyMap = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+    const camelotMap = {
+      'C':{major:'8B',minor:'5A'},'C#':{major:'9B',minor:'6A'},'D':{major:'10B',minor:'7A'},
+      'D#':{major:'11B',minor:'8A'},'E':{major:'12B',minor:'9A'},'F':{major:'1B',minor:'10A'},
+      'F#':{major:'2B',minor:'11A'},'G':{major:'3B',minor:'12A'},'G#':{major:'4B',minor:'1A'},
+      'A':{major:'5B',minor:'2A'},'A#':{major:'6B',minor:'3A'},'B':{major:'7B',minor:'4A'}
+    };
+    function getCamelot(key, mode) {
+      if (!key || key==='N/A') return 'N/A';
+      const m = mode === 'Maior' ? 'major' : 'minor';
+      return camelotMap[key]?.[m] || 'N/A';
+    }
+    function formatTime(sec) { if(!sec) return '0:00'; const m=Math.floor(sec/60), s=Math.floor(sec%60); return `${m}:${s.toString().padStart(2,'0')}`; }
+    function escapeHtml(str) { return String(str).replace(/[&<>]/g, m=> ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    function escapeXml(str) { return String(str).replace(/[<>&]/g, m=> ({'<':'&lt;','>':'&gt;','&':'&amp;'})[m]); }
+    function toast(msg, duration=2500) {
+      const t = elements.toast;
+      t.textContent = msg; t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), duration);
+    }
+    function showSpinner(show=true) {
+      elements.searchSpinner.style.display = show ? 'block' : 'none';
+    }
+    function debounce(fn, ms) { let timer; return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms); }; }
+
+    // ==================== SPOTIFY AUTH (PKCE) ====================
+    function generateCodeVerifier() {
+      const array = new Uint32Array(56); crypto.getRandomValues(array);
+      return Array.from(array, dec => ('0' + dec.toString(16)).slice(-2)).join('');
+    }
+    async function generateCodeChallenge(verifier) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(verifier);
+      const digest = await crypto.subtle.digest('SHA-256', data);
+      return btoa(String.fromCharCode(...new Uint8Array(digest)))
+        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+    function saveSpotifyToken(data) {
+      spotifyToken = data.access_token;
+      tokenExpiry = Date.now() + data.expires_in * 1000;
+      spotifyRefreshToken = data.refresh_token || null;
+      localStorage.setItem('spotify_token', JSON.stringify({ access_token: spotifyToken, refresh_token: spotifyRefreshToken, expiry: tokenExpiry }));
+    }
+    function loadSpotifyToken() {
+      const saved = localStorage.getItem('spotify_token');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          spotifyToken = parsed.access_token;
+          spotifyRefreshToken = parsed.refresh_token || null;
+          tokenExpiry = parsed.expiry || 0;
+          if (Date.now() < tokenExpiry) return true;
+        } catch(e) {}
+      }
+      return false;
+    }
+    async function refreshSpotifyToken() {
+      if (!spotifyRefreshToken || !spotifyClientId) return false;
+      try {
+        const res = await fetch('https://accounts.spotify.com/api/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: spotifyRefreshToken, client_id: spotifyClientId })
+        });
+        const data = await res.json();
+        if (data.access_token) { saveSpotifyToken(data); return true; }
+      } catch(e) { toast('Erro ao renovar token Spotify'); }
+      return false;
+    }
+    async function ensureSpotifyToken() {
+      if (spotifyToken && Date.now() < tokenExpiry) return spotifyToken;
+      if (spotifyRefreshToken) {
+        const ok = await refreshSpotifyToken();
+        if (ok) return spotifyToken;
+      }
+      // Se não conseguiu renovar, tenta carregar do localStorage (pode ter sido salvo de outra aba)
+      if (loadSpotifyToken() && Date.now() < tokenExpiry) return spotifyToken;
+      // Se nada funcionar, solicita novo login
+      toast('Sessão Spotify expirada. Faça login novamente.');
+      document.getElementById('spotifyLoginBtn').style.display = 'inline-block';
+      return null;
+    }
+    async function startSpotifyLogin() {
+      if (!spotifyClientId) { toast('Informe o Client ID primeiro'); return; }
+      const verifier = generateCodeVerifier();
+      localStorage.setItem('spotify_code_verifier', verifier);
+      const challenge = await generateCodeChallenge(verifier);
+      const params = new URLSearchParams({
+        client_id: spotifyClientId,
+        response_type: 'code',
+        redirect_uri: SPOTIFY_REDIRECT_URI,
+        code_challenge_method: 'S256',
+        code_challenge: challenge,
+        scope: 'user-read-private playlist-modify-public playlist-modify-private'
+      });
+      window.location.href = 'https://accounts.spotify.com/authorize?' + params.toString();
+    }
+    async function handleSpotifyCallback() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      if (!code || !spotifyClientId) return false;
+      const verifier = localStorage.getItem('spotify_code_verifier');
+      if (!verifier) { toast('Verificador PKCE não encontrado'); return false; }
+      try {
+        const res = await fetch('https://accounts.spotify.com/api/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({
+            client_id: spotifyClientId,
+            grant_type: 'authorization_code',
+            code: code,
+            redirect_uri: SPOTIFY_REDIRECT_URI,
+            code_verifier: verifier
+          })
+        });
+        const data = await res.json();
+        if (data.access_token) {
+          saveSpotifyToken(data);
+          localStorage.removeItem('spotify_code_verifier');
+          // Limpa a URL
+          window.history.replaceState({}, document.title, window.location.pathname);
+          toast('Login Spotify realizado!');
+          elements.spotifyLoginBtn.style.display = 'none';
+          elements.keysStatus.textContent = '✅ Conectado (PKCE)';
+          loadInitialSuggestions();
+          return true;
+        } else {
+          toast('Erro na autenticação: ' + (data.error_description || ''));
+        }
+      } catch(e) { toast('Falha na conexão com Spotify'); }
+      return false;
+    }
+
+    // ==================== SPOTIFY API ====================
+    async function spotifyFetch(url, options={}) {
+      const token = await ensureSpotifyToken();
+      if (!token) throw new Error('Token Spotify não disponível');
+      const headers = { 'Authorization': `Bearer ${token}`, ...options.headers };
+      const res = await fetch(url, { ...options, headers });
+      if (res.status === 401) {
+        // Token expirado, tenta renovar uma vez
+        const renewed = await refreshSpotifyToken();
+        if (renewed) {
+          headers.Authorization = `Bearer ${spotifyToken}`;
+          const retryRes = await fetch(url, { ...options, headers });
+          if (retryRes.ok) return retryRes;
+        }
+        throw new Error('Não autorizado');
+      }
+      if (!res.ok) throw new Error(`Erro ${res.status}`);
+      return res;
+    }
+
+    function formatTrack(track, features) {
+      const feat = features || {};
+      let bpm = feat.tempo ? Math.round(feat.tempo) : null;
+      const custom = customBpm[track.id];
+      if (custom) bpm = custom;
+      const key = keyMap[feat.key] || 'N/A';
+      const mode = feat.mode === 1 ? 'Maior' : (feat.mode === 0 ? 'Menor' : 'N/A');
+      const camelot = getCamelot(key, mode);
+      const energy = feat.energy || 0;
+      let energyClass = energy > 0.6 ? 'energy-high' : (energy > 0.3 ? 'energy-mid' : 'energy-low');
+      return {
+        id: track.id,
+        title: track.name,
+        artist: track.artists[0].name,
+        preview: track.preview_url,
+        spotifyUrl: track.external_urls.spotify,
+        releaseDate: track.album.release_date || 'N/A',
+        popularity: track.popularity || 0,
+        bpm: bpm || 'N/A',
+        key, mode, camelot,
+        energy,
+        energyClass,
+        duration: Math.round((track.duration_ms || 0) / 1000),
+        albumCover: track.album.images[0]?.url,
+        valence: feat.valence || 0.5
+      };
+    }
+
+    async function searchSpotify(query, limit=30, offset=0, recentOnly=false) {
+      const cacheKey = `${query}-${limit}-${offset}-${recentOnly}`;
+      if (searchCache.has(cacheKey)) return searchCache.get(cacheKey);
+      try {
+        const res = await spotifyFetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=${limit}&offset=${offset}&market=BR`);
+        const data = await res.json();
+        if (!data.tracks?.items.length) return [];
+        let tracks = data.tracks.items;
+        if (recentOnly) {
+          const tresMeses = new Date(); tresMeses.setMonth(tresMeses.getMonth()-3);
+          tracks = tracks.filter(t => t.album.release_date && new Date(t.album.release_date) >= tresMeses);
+        }
+        const ids = tracks.map(t=>t.id);
+        const [featRes] = await Promise.all([
+          spotifyFetch(`https://api.spotify.com/v1/audio-features?ids=${ids.join(',')}`),
+        ]);
+        const featData = await featRes.json();
+        const features = featData.audio_features || [];
+        const result = tracks.map((track, idx) => formatTrack(track, features[idx]));
+        searchCache.set(cacheKey, result);
+        return result;
+      } catch(e) {
+        toast('Erro na busca: ' + e.message);
+        return [];
+      }
+    }
+
+    async function getTop50Brasil(recentOnly=false) {
+      try {
+        const res = await spotifyFetch('https://api.spotify.com/v1/playlists/37i9dQZEVXbMXbN3EUUhlg/tracks?limit=30&market=BR');
+        const data = await res.json();
+        if (!data.items) return [];
+        let tracks = data.items.map(i=>i.track).filter(t=>t);
+        if (recentOnly) {
+          const tresMeses = new Date(); tresMeses.setMonth(tresMeses.getMonth()-3);
+          tracks = tracks.filter(t => t.album.release_date && new Date(t.album.release_date) >= tresMeses);
+        }
+        const ids = tracks.map(t=>t.id);
+        const featRes = await spotifyFetch(`https://api.spotify.com/v1/audio-features?ids=${ids.join(',')}`);
+        const featData = await featRes.json();
+        const features = featData.audio_features || [];
+        return tracks.map((track, idx) => formatTrack(track, features[idx]));
+      } catch(e) { toast('Erro ao carregar Top 50'); return []; }
+    }
+
+    // ==================== YOUTUBE ====================
+    async function getYouTubeUrl(query) {
+      if (!youtubeApiKey) return null;
+      try {
+        const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=${encodeURIComponent(query)}&type=video&key=${youtubeApiKey}`;
+        const r = await fetch(url);
+        const d = await r.json();
+        if (d.items?.[0]) return `https://www.youtube.com/watch?v=${d.items[0].id.videoId}`;
+      } catch(e) {}
+      return null;
+    }
+
+    // ==================== FAVORITOS & HISTÓRICO ====================
+    function toggleFavorite(track) {
+      const idx = favorites.findIndex(f=>f.id===track.id);
+      if (idx===-1) favorites.push({ id:track.id, title:track.title, artist:track.artist, spotifyUrl:track.spotifyUrl, preview:track.preview });
+      else favorites.splice(idx,1);
+      localStorage.setItem('hitregio_favorites', JSON.stringify(favorites));
+      renderFavorites();
+      updateFavoriteButtons();
+    }
+    function renderFavorites() {
+      if (!favorites.length) { elements.favoritesList.innerHTML = '<p style="text-align:center; color:#888;">Nenhum favorito</p>'; return; }
+      elements.favoritesList.innerHTML = favorites.map(track => `
+        <div class="music-card">
+          <div class="music-header"><span class="music-title">${escapeHtml(track.title)}</span></div>
+          <div class="music-artist">${escapeHtml(track.artist)}</div>
+          <div class="music-actions">
+            <button class="fav-preview" data-title="${track.title}" data-artist="${track.artist}">▶ Prévia</button>
+            <button class="fav-spotify" data-url="${track.spotifyUrl}">🎧 Spotify</button>
+            <button class="fav-remove" data-id="${track.id}">❤️ Remover</button>
+          </div>
+        </div>
+      `).join('');
+      document.querySelectorAll('.fav-preview').forEach(btn => btn.addEventListener('click', async ()=>{
+        const fb = await fetchPreviewFallback(btn.dataset.title, btn.dataset.artist);
+        if (fb) playSimplePreview(fb); else toast('Sem prévia disponível');
+      }));
+      document.querySelectorAll('.fav-spotify').forEach(btn => btn.addEventListener('click', ()=>window.open(btn.dataset.url,'_blank')));
+      document.querySelectorAll('.fav-remove').forEach(btn => btn.addEventListener('click', ()=>{
+        favorites = favorites.filter(f=>f.id!==btn.dataset.id);
+        localStorage.setItem('hitregio_favorites', JSON.stringify(favorites));
+        renderFavorites();
+        updateFavoriteButtons();
+      }));
+    }
+    function updateFavoriteButtons() {
+      document.querySelectorAll('.fav-btn').forEach(btn => {
+        const id = btn.dataset.id;
+        const isFav = favorites.some(f=>f.id===id);
+        btn.classList.toggle('fav-active', isFav);
+        btn.textContent = isFav ? '❤️' : '🤍';
+      });
+    }
+    function addToHistory(q) {
+      if (!q) return;
+      searchHistory = searchHistory.filter(s=>s!==q);
+      searchHistory.unshift(q);
+      if (searchHistory.length>10) searchHistory.pop();
+      localStorage.setItem('hitregio_history', JSON.stringify(searchHistory));
+      renderHistory();
+    }
+    function renderHistory() {
+      const container = elements.historyList;
+      if (!searchHistory.length) { container.innerHTML = ''; return; }
+      container.innerHTML = searchHistory.map(q => `<span class="history-item" data-q="${q}">${q}</span>`).join('');
+      document.querySelectorAll('.history-item').forEach(el => {
+        el.addEventListener('click', () => {
+          elements.searchInput.value = el.dataset.q;
+          doSearch(el.dataset.q);
+        });
+      });
+    }
+
+    // ==================== RENDERIZAÇÃO DE RESULTADOS ====================
+    function applyFilters() {
+      // Usa classes para esconder cards ao invés de re-render
+      const bpmMin = parseFloat(elements.bpmMin.value) || 0;
+      const bpmMax = parseFloat(elements.bpmMax.value) || 999;
+      const durFilter = elements.durationFilter.value;
+      const cards = document.querySelectorAll('#results .music-card');
+      cards.forEach(card => {
+        const bpm = parseFloat(card.dataset.bpm);
+        const duration = parseInt(card.dataset.duration);
+        let show = true;
+        if (bpm && (bpm < bpmMin || bpm > bpmMax)) show = false;
+        if (durFilter === 'short' && duration >= 180) show = false;
+        if (durFilter === 'medium' && (duration < 180 || duration > 300)) show = false;
+        if (durFilter === 'long' && duration <= 300) show = false;
+        card.classList.toggle('hidden-filter', !show);
+      });
+    }
+    function sortTracks(tracks) {
+      const copy = [...tracks];
+      switch(sortType) {
+        case 'popularity': return copy.sort((a,b)=>b.popularity - a.popularity);
+        case 'bpm_asc': return copy.sort((a,b)=> (a.bpm==='N/A'?999:a.bpm) - (b.bpm==='N/A'?999:b.bpm));
+        case 'bpm_desc': return copy.sort((a,b)=> (b.bpm==='N/A'?-999:b.bpm) - (a.bpm==='N/A'?-999:a.bpm));
+        case 'date_desc': return copy.sort((a,b)=> new Date(b.releaseDate) - new Date(a.releaseDate));
+        default: return copy;
+      }
+    }
+    function renderTracks(tracks, reset=true) {
+      if (reset) {
+        originalTracks = tracks;
+        currentTracks = sortTracks(tracks);
+        currentOffset = currentTracks.length;
+        elements.results.innerHTML = '';
+      } else {
+        currentTracks = [...currentTracks, ...sortTracks(tracks)];
+        currentOffset += tracks.length;
+      }
+      if (!currentTracks.length && reset) {
+        elements.results.innerHTML = '<p style="text-align:center; color:#888;">Nenhum resultado encontrado</p>';
+        elements.loadMoreBtn.style.display = 'none';
+        return;
+      }
+      currentTracks.forEach(track => {
+        const isFav = favorites.some(f=>f.id===track.id);
+        const note = notes[track.id] || '';
+        const card = document.createElement('div');
+        card.className = 'music-card';
+        card.dataset.bpm = track.bpm === 'N/A' ? '' : track.bpm;
+        card.dataset.duration = track.duration;
+        card.innerHTML = `
+          <div class="music-header">
+            <span class="music-title">${escapeHtml(track.title)}</span>
+            <span style="font-size:0.7rem; background:#2c2c2c; padding:2px 8px; border-radius:12px;">🎵 ${track.bpm} BPM</span>
+          </div>
+          <div class="music-artist">${escapeHtml(track.artist)}</div>
+          <div class="music-meta">
+            <span class="badge">📅 ${track.releaseDate}</span>
+            <span class="badge">📊 ${track.popularity}</span>
+            <span class="badge camelot-badge">🔀 ${track.camelot}</span>
+            <span class="badge">⚡ ${Math.round(track.energy*100)}% <span class="energy-bar"><span class="energy-fill ${track.energyClass}" style="width:${track.energy*100}%;"></span></span></span>
+            <span class="badge">⏱️ ${formatTime(track.duration)}</span>
+          </div>
+          <div class="music-actions">
+            <button class="preview-btn" data-url="${track.preview||''}" data-id="${track.id}">▶ Prévia</button>
+            <button class="spotify-btn" data-url="${track.spotifyUrl}">🎧 Spotify</button>
+            <button class="youtube-btn" data-query="${track.title} ${track.artist}">🎬 YouTube</button>
+            <button class="fav-btn ${isFav?'fav-active':''}" data-id="${track.id}">${isFav?'❤️':'🤍'}</button>
+            <button class="suggest-btn" data-id="${track.id}">🧠 Sugerir</button>
+          </div>
+          <input class="note-input" type="text" placeholder="Nota pessoal..." data-id="${track.id}" value="${escapeHtml(note)}">
+          <div id="suggestions-${track.id}" class="suggestion-box" style="display:none;"></div>
+        `;
+        elements.results.appendChild(card);
+      });
+      attachTrackEvents();
+      elements.loadMoreBtn.style.display = (currentTracks.length >= 30) ? 'block' : 'none';
+    }
+    function attachTrackEvents() {
+      // Prévia
+      document.querySelectorAll('.preview-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const url = btn.dataset.url;
+          const track = currentTracks.find(t=>t.id===btn.dataset.id);
+          if (!track) return;
+          if (url && url!=='null') showPlayer(track, url);
+          else {
+            const fb = await fetchPreviewFallback(track.title, track.artist);
+            if (fb) showPlayer(track, fb);
+            else toast('Prévia indisponível');
+          }
+          if (isSequential) stopSequential();
+        });
+      });
+      // Spotify
+      document.querySelectorAll('.spotify-btn').forEach(btn => {
+        btn.addEventListener('click', ()=>window.open(btn.dataset.url,'_blank'));
+      });
+      // YouTube
+      document.querySelectorAll('.youtube-btn').forEach(btn => {
+        btn.addEventListener('click', async ()=>{
+          let url = youtubeApiKey ? await getYouTubeUrl(btn.dataset.query) : null;
+          window.open(url || `https://www.youtube.com/results?search_query=${encodeURIComponent(btn.dataset.query)}`, '_blank');
+        });
+      });
+      // Favoritos
+      document.querySelectorAll('.fav-btn').forEach(btn => {
+        btn.addEventListener('click', ()=>{
+          const track = currentTracks.find(t=>t.id===btn.dataset.id);
+          if (track) toggleFavorite(track);
+        });
+      });
+      // Sugestões Camelot
+      document.querySelectorAll('.suggest-btn').forEach(btn => {
+        btn.addEventListener('click', ()=>{
+          const track = currentTracks.find(t=>t.id===btn.dataset.id);
+          if (!track) return;
+          const container = document.getElementById(`suggestions-${track.id}`);
+          if (!container) return;
+          if (container.style.display === 'block') { container.style.display = 'none'; return; }
+          const compatible = getCamelotCompatible(track.camelot);
+          const suggestions = currentTracks.filter(t => t.id!==track.id && compatible.includes(t.camelot)).slice(0,5);
+          if (!suggestions.length) {
+            container.innerHTML = '<span style="color:#888;">Nenhuma sugestão harmônica disponível.</span>';
+            container.style.display = 'block';
+            return;
+          }
+          container.innerHTML = suggestions.map(s => `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid #444;">
+              <span><strong>${escapeHtml(s.title)}</strong> - ${escapeHtml(s.artist)} (${s.camelot})</span>
+              <button class="sugg-play" data-id="${s.id}" style="background:#ff6600; border:none; border-radius:12px; padding:4px 8px; color:#fff;">▶</button>
+            </div>
+          `).join('');
+          container.style.display = 'block';
+          document.querySelectorAll('.sugg-play').forEach(b => {
+            b.addEventListener('click', async ()=>{
+              const sTrack = currentTracks.find(t=>t.id===b.dataset.id);
+              if (!sTrack) return;
+              if (sTrack.preview) showPlayer(sTrack, sTrack.preview);
+              else {
+                const fb = await fetchPreviewFallback(sTrack.title, sTrack.artist);
+                if (fb) showPlayer(sTrack, fb);
+              }
+            });
+          });
+        });
+      });
+      // Notas
+      document.querySelectorAll('.note-input').forEach(input => {
+        input.addEventListener('change', ()=>{
+          const id = input.dataset.id;
+          const val = input.value.trim();
+          if (val) notes[id] = val;
+          else delete notes[id];
+          localStorage.setItem('hitregio_notes', JSON.stringify(notes));
+        });
+      });
+    }
+    function getCamelotCompatible(camelot) {
+      if (camelot==='N/A') return [];
+      const num = parseInt(camelot.slice(0,-1));
+      const letter = camelot.slice(-1);
+      const res = [camelot, num + (letter==='A'?'B':'A')];
+      if (num>1) res.push((num-1)+letter);
+      if (num<12) res.push((num+1)+letter);
+      return res;
+    }
+
+    // ==================== PLAYER ====================
+    function showPlayer(track, url) {
+      elements.playerPanel.style.display = 'block';
+      elements.playerTitle.textContent = track.title;
+      elements.playerArtist.textContent = track.artist;
+      elements.playerCover.src = track.albumCover || '';
+      elements.volumeSlider.value = audio?.volume || 1;
+      if (audio) audio.pause();
+      audio = new Audio(url);
+      audio.volume = elements.volumeSlider.value;
+      const playPause = elements.playPauseBtn;
+      const progressFill = elements.progressFill;
+      const currentTime = elements.currentTime;
+      const durationTime = elements.durationTime;
+      const progressBar = elements.progressBar;
+
+      audio.addEventListener('timeupdate', () => {
+        if (!audio) return;
+        const pct = (audio.currentTime / audio.duration) * 100 || 0;
+        progressFill.style.width = pct + '%';
+        currentTime.textContent = formatTime(audio.currentTime);
+        durationTime.textContent = formatTime(audio.duration);
+      });
+      audio.addEventListener('ended', () => {
+        if (isSequential) playNextInSequence();
+        else { playPause.textContent = '▶'; isPlaying = false; }
+      });
+      audio.play().catch(e => toast('Erro ao tocar: ' + e.message));
+      isPlaying = true;
+      playPause.textContent = '⏸';
+      currentPlayerTrack = track;
+
+      playPause.onclick = () => {
+        if (!audio) return;
+        if (isPlaying) { audio.pause(); playPause.textContent = '▶'; }
+        else { audio.play(); playPause.textContent = '⏸'; }
+        isPlaying = !isPlaying;
+      };
+      elements.stopPlayerBtn.onclick = () => {
+        if (audio) { audio.pause(); audio.currentTime = 0; }
+        elements.playerPanel.style.display = 'none';
+        isPlaying = false; currentPlayerTrack = null; stopSequential();
+      };
+      progressBar.onclick = (e) => {
+        if (!audio) return;
+        const rect = progressBar.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        audio.currentTime = (x / rect.width) * audio.duration;
+      };
+      elements.volumeSlider.oninput = () => {
+        if (audio) audio.volume = elements.volumeSlider.value;
+      };
+    }
+    function playSimplePreview(url) {
+      if (audio) audio.pause();
+      audio = new Audio(url);
+      audio.play().catch(()=>{});
+    }
+    async function fetchPreviewFallback(title, artist) {
+      const query = `${title} ${artist}`;
+      try {
+        const r = await fetch(`https://api.deezer.com/search?q=${encodeURIComponent(query)}&limit=1`);
+        const d = await r.json();
+        if (d.data?.[0]?.preview) return d.data[0].preview;
+      } catch(e) {}
+      try {
+        const r = await fetch(`https://corsproxy.io/?https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=musicTrack&limit=1`);
+        const d = await r.json();
+        if (d.results?.[0]?.previewUrl) return d.results[0].previewUrl;
+      } catch(e) {}
+      return null;
+    }
+
+    // Sequência
+    function startSequential() {
+      if (!currentTracks.length) return toast('Nenhuma música na lista.');
+      if (audio) audio.pause();
+      isSequential = true;
+      seqIndex = 0;
+      playerQueue = [...currentTracks];
+      renderQueue();
+      playTrackAtIndex(seqIndex);
+      requestWakeLock();
+    }
+    function stopSequential() {
+      isSequential = false;
+      playerQueue = [];
+      renderQueue();
+      releaseWakeLock();
+      elements.status.textContent = '';
+    }
+    function playTrackAtIndex(index) {
+      if (!isSequential || index >= playerQueue.length) { stopSequential(); return; }
+      seqIndex = index;
+      const track = playerQueue[index];
+      const playTrack = (url) => {
+        if (url) {
+          showPlayer(track, url);
+          elements.status.textContent = `▶ Sequência: ${track.title} (${index+1}/${playerQueue.length})`;
+          audio.onended = () => { if (isSequential) playTrackAtIndex(index+1); };
+        } else playTrackAtIndex(index+1);
+      };
+      if (track.preview) playTrack(track.preview);
+      else fetchPreviewFallback(track.title, track.artist).then(playTrack);
+      renderQueue();
+    }
+    function playNextInSequence() { if (isSequential) playTrackAtIndex(seqIndex+1); }
+    function renderQueue() {
+      if (!isSequential || !playerQueue.length) {
+        elements.queueList.style.display = 'none';
+        return;
+      }
+      elements.queueList.style.display = 'block';
+      elements.queueList.innerHTML = playerQueue.slice(seqIndex).map((t,i) => 
+        `<div class="queue-item" style="${i===0?'color:#ff6600':''}">${i===0?'▶ ':''}${t.artist} - ${t.title}</div>`
+      ).join('');
+    }
+    elements.prevBtn.addEventListener('click', ()=> { if(isSequential && seqIndex>0) playTrackAtIndex(seqIndex-1); });
+    elements.nextBtn.addEventListener('click', ()=> { if(isSequential) playTrackAtIndex(seqIndex+1); });
+
+    // WakeLock
+    async function requestWakeLock() {
+      if ('wakeLock' in navigator) {
+        try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e) {}
+      }
+    }
+    async function releaseWakeLock() {
+      if (wakeLock) { try { await wakeLock.release(); } catch(e) {} wakeLock = null; }
+    }
+
+    // ==================== BUSCA PRINCIPAL ====================
+    async function doSearch(query, isHits=false) {
+      if (!query && !isHits) return;
+      addToHistory(query);
+      currentQuery = query;
+      const recentOnly = elements.recentOnly.checked;
+      showSpinner(true);
+      let tracks = [];
+      if (isHits) tracks = await getTop50Brasil(recentOnly);
+      else {
+        tracks = await searchSpotify(query, 30, 0, recentOnly);
+        if (query.toLowerCase().includes('remix')) tracks = tracks.filter(t => t.title.toLowerCase().includes('remix'));
+      }
+      showSpinner(false);
+      renderTracks(tracks, true);
+      if (isSequential) stopSequential();
+    }
+    function searchOccasion(occ) {
+      let term = '';
+      switch(occ) {
+        case 'casamento': term = 'músicas românticas casamento'; break;
+        case 'balada': term = 'hits balada dançante'; break;
+        case 'barzinho': term = 'músicas barzinho acústico'; break;
+        case 'formatura': term = 'músicas formatura animadas'; break;
+      }
+      elements.searchInput.value = term;
+      doSearch(term);
+    }
+
+    // ==================== PLAYLIST SPOTIFY & YOUTUBE ====================
+    async function createSpotifyPlaylist() {
+      if (!currentTracks.length) return toast('Nenhuma música na lista');
+      const token = await ensureSpotifyToken();
+      if (!token) return toast('Faça login no Spotify (com escopo de playlist)');
+      try {
+        const userRes = await spotifyFetch('https://api.spotify.com/v1/me');
+        const userData = await userRes.json();
+        const userId = userData.id;
+        const playlistRes = await spotifyFetch(`https://api.spotify.com/v1/users/${userId}/playlists`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: 'HitRegio Playlist', public: true })
+        });
+        const playlist = await playlistRes.json();
+        const uris = currentTracks.map(t => `spotify:track:${t.id}`);
+        // Adiciona em lotes de 100
+        for (let i=0; i<uris.length; i+=100) {
+          await spotifyFetch(`https://api.spotify.com/v1/playlists/${playlist.id}/tracks`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ uris: uris.slice(i, i+100) })
+          });
+        }
+        toast('Playlist criada! Abrindo...');
+        window.open(playlist.external_urls.spotify, '_blank');
+      } catch(e) { toast('Erro ao criar playlist: ' + e.message); }
+    }
+    function openYouTubePlaylist() {
+      if (!currentTracks.length) return toast('Nenhuma música');
+      const links = currentTracks.map(t => `https://www.youtube.com/results?search_query=${encodeURIComponent(t.artist + ' ' + t.title)}`);
+      const html = `<html><head><title>HitRegio YouTube</title></head><body><h2>Clique nos links para abrir no YouTube</h2><ul>${links.map(l=>`<li><a href="${l}" target="_blank">${l}</a></li>`).join('')}</ul></body></html>`;
+      const blob = new Blob([html], {type:'text/html'});
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+    }
+    function sharePlaylist() {
+      if (!currentTracks.length) return toast('Nenhuma música');
+      const ids = currentTracks.map(t => t.id).join(',');
+      const encoded = btoa(ids);
+      const shareUrl = `${window.location.origin}${window.location.pathname}?share=${encoded}`;
+      navigator.clipboard.writeText(shareUrl).then(() => toast('Link copiado!')).catch(() => prompt('Copie o link:', shareUrl));
+    }
+    function loadSharedPlaylist() {
+      const params = new URLSearchParams(window.location.search);
+      const share = params.get('share');
+      if (share) {
+        try {
+          const ids = atob(share).split(',');
+          if (ids.length) {
+            spotifyFetch(`https://api.spotify.com/v1/tracks?ids=${ids.join(',')}`).then(async res => {
+              const data = await res.json();
+              if (data.tracks) {
+                const featRes = await spotifyFetch(`https://api.spotify.com/v1/audio-features?ids=${ids.join(',')}`);
+                const featData = await featRes.json();
+                const tracks = data.tracks.map((t,i) => formatTrack(t, featData.audio_features[i]));
+                renderTracks(tracks, true);
+                toast(`Playlist compartilhada carregada (${tracks.length} músicas)`);
+              }
+            }).catch(()=> toast('Erro ao carregar playlist compartilhada'));
+          }
+        } catch(e) { toast('Link inválido'); }
+      }
+    }
+
+    // ==================== EXPORTAÇÃO ====================
+    function exportPlaylist(format) {
+      if (!currentTracks.length) return toast('Nenhuma música para exportar.');
+      let content = '';
+      if (format==='txt') content = currentTracks.map((t,i)=>`${i+1}. ${t.artist} - ${t.title} (${t.bpm} BPM, ${t.camelot})`).join('\n');
+      else if (format==='csv') content = 'Artist,Title,BPM,Camelot,Key,Mode,Energy,Duration\n' + currentTracks.map(t=>`"${t.artist}","${t.title}",${t.bpm},${t.camelot},${t.key},${t.mode},${Math.round(t.energy*100)},${t.duration}`).join('\n');
+      else if (format==='m3u') content = currentTracks.map(t=>t.spotifyUrl).join('\n');
+      else if (format==='xml') {
+        content = `<?xml version="1.0" encoding="UTF-8"?><playlist version="1" xmlns="http://xspf.org/ns/0/"><trackList>`;
+        content += currentTracks.map(t => `<track><title>${escapeXml(t.title)}</title><creator>${escapeXml(t.artist)}</creator><location>${t.spotifyUrl}</location><duration>${t.duration*1000}</duration><bpm>${t.bpm}</bpm><camelot>${t.camelot}</camelot></track>`).join('');
+        content += `</trackList></playlist>`;
+      }
+      const blob = new Blob([content], {type:'text/plain'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `playlist.${format}`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    // ==================== VOZ ====================
+    function startVoice() {
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        toast('Reconhecimento de voz não suportado.');
+        return;
+      }
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const rec = new SR();
+      rec.lang = 'pt-BR';
+      rec.continuous = false;
+      rec.interimResults = false;
+      rec.onresult = (e) => {
+        const text = e.results[0][0].transcript;
+        elements.searchInput.value = text;
+        doSearch(text);
+      };
+      rec.onerror = () => toast('Erro no reconhecimento de voz.');
+      rec.start();
+      toast('🎤 Ouvindo...');
+    }
+
+    // ==================== INICIALIZAÇÃO ====================
+    function loadKeys() {
+      spotifyClientId = localStorage.getItem(SPOTIFY_CLIENT_ID_KEY) || '';
+      youtubeApiKey = localStorage.getItem(YOUTUBE_API_KEY_KEY) || '';
+      elements.spotifyClientId.value = spotifyClientId;
+      elements.youtubeApiKey.value = youtubeApiKey;
+      if (spotifyClientId) {
+        elements.spotifyLoginBtn.style.display = 'inline-block';
+        loadSpotifyToken();
+        if (spotifyToken && Date.now() < tokenExpiry) {
+          elements.keysStatus.textContent = '✅ Conectado (PKCE)';
+          loadInitialSuggestions();
+        } else {
+          elements.keysStatus.textContent = '🔐 Faça login';
+        }
+      }
+    }
+    function saveKeys() {
+      spotifyClientId = elements.spotifyClientId.value.trim();
+      youtubeApiKey = elements.youtubeApiKey.value.trim();
+      if (spotifyClientId) localStorage.setItem(SPOTIFY_CLIENT_ID_KEY, spotifyClientId);
+      if (youtubeApiKey) localStorage.setItem(YOUTUBE_API_KEY_KEY, youtubeApiKey);
+      if (spotifyClientId) {
+        elements.spotifyLoginBtn.style.display = 'inline-block';
+        handleSpotifyCallback(); // tenta processar callback se houver code na URL
+      }
+    }
+
+    // Event Listeners
+    elements.saveKeysBtn.addEventListener('click', saveKeys);
+    elements.spotifyLoginBtn.addEventListener('click', startSpotifyLogin);
+    elements.searchInput.addEventListener('keypress', (e) => { if (e.key==='Enter') doSearch(e.target.value.trim()); });
+    elements.searchBtn.addEventListener('click', ()=>{
+      let term = elements.searchInput.value.trim();
+      if (elements.genreSelect.value) term += ` ${elements.genreSelect.value}`;
+      if (term) doSearch(term);
+    });
+    elements.remixBtn.addEventListener('click', ()=>{
+      let term = elements.searchInput.value.trim();
+      if (!term) return toast('Digite um termo de busca');
+      doSearch(`${term} remix`);
+    });
+    elements.hitsBtn.addEventListener('click', ()=>doSearch('', true));
+    elements.voiceBtn.addEventListener('click', startVoice);
+    elements.loadMoreBtn.addEventListener('click', async ()=>{
+      showSpinner(true);
+      const more = await searchSpotify(currentQuery, 30, currentOffset, elements.recentOnly.checked);
+      showSpinner(false);
+      if (more.length) renderTracks(more, false);
+      else elements.loadMoreBtn.style.display = 'none';
+    });
+    elements.applyBpmFilter.addEventListener('click', applyFilters);
+    elements.durationFilter.addEventListener('change', applyFilters);
+    elements.occasionBtns.forEach(btn => btn.addEventListener('click', ()=>searchOccasion(btn.dataset.occ)));
+    elements.spotifyPlaylistBtn.addEventListener('click', createSpotifyPlaylist);
+    elements.youtubePlaylistBtn.addEventListener('click', openYouTubePlaylist);
+    elements.sharePlaylistBtn.addEventListener('click', sharePlaylist);
+    elements.clearFavs.addEventListener('click', ()=>{
+      if (confirm('Limpar todos os favoritos?')) {
+        favorites = [];
+        localStorage.setItem('hitregio_favorites', JSON.stringify(favorites));
+        renderFavorites();
+        updateFavoriteButtons();
+      }
+    });
+    elements.tabButtons.forEach(tab => {
+      tab.addEventListener('click', ()=>{
+        elements.tabButtons.forEach(t=>t.classList.remove('active'));
+        tab.classList.add('active');
+        elements.panels.forEach(p=>p.classList.remove('active'));
+        document.getElementById(tab.dataset.tab).classList.add('active');
+      });
+    });
+    // Tema
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (localStorage.getItem('theme') === 'light' || (!localStorage.getItem('theme') && !prefersDark)) {
+      document.body.classList.add('light');
+    }
+    elements.themeToggle.addEventListener('click', ()=>{
+      document.body.classList.toggle('light');
+      localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark');
+    });
+    // Pull-to-refresh simples
+    let touchStartY = 0;
+    document.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; });
+    document.addEventListener('touchmove', e => {
+      const delta = e.touches[0].clientY - touchStartY;
+      if (delta > 80 && window.scrollY === 0) {
+        elements.pullIndicator.style.display = 'block';
+      }
+    });
+    document.addEventListener('touchend', async () => {
+      if (elements.pullIndicator.style.display === 'block') {
+        elements.pullIndicator.style.display = 'none';
+        if (currentQuery) await doSearch(currentQuery);
+        else toast('Faça uma busca primeiro');
+      }
+    });
+
+    // Ao carregar
+    loadKeys();
+    renderFavorites();
+    renderHistory();
+    handleSpotifyCallback().then(() => {});
+    loadSharedPlaylist();
+  })();
+</script>
 </body>
 </html>
