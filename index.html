@@ -17,63 +17,66 @@
       --star: #ffd600;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 16px; padding-bottom: 100px; }
-    .app { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+    body { font-family: 'Inter', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 16px; padding-bottom: 110px; }
+    .app { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
     header { display: flex; justify-content: space-between; align-items: center; }
-    h1 { font-size: 1.8rem; font-weight: 700; background: linear-gradient(135deg, var(--accent), #ffaa00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    h1 { font-size: 1.6rem; font-weight: 700; background: linear-gradient(135deg, var(--accent), #ffaa00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     
-    .search-container { display: flex; flex-direction: column; gap: 8px; background: var(--surface); padding: 12px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+    .search-container { display: flex; flex-direction: column; gap: 8px; background: var(--surface); padding: 12px; border-radius: 14px; }
     .search-box { display: flex; gap: 8px; flex-wrap: wrap; }
-    .search-box input { flex: 2; min-width: 180px; padding: 12px; border-radius: 12px; border: none; background: var(--surface2); color: var(--text); font-size: 1rem; font-weight: 500; }
+    .search-box input { flex: 2; min-width: 180px; padding: 10px; border-radius: 10px; border: none; background: var(--surface2); color: var(--text); font-size: 0.95rem; }
     .search-box input:focus, .search-box select:focus { outline: 2px solid var(--accent); }
-    .search-box select { flex: 1; min-width: 140px; padding: 12px; border-radius: 12px; border: none; background: var(--surface2); color: var(--text); font-size: 0.9rem; font-weight: 600; cursor: pointer; }
-    .search-box button { background: var(--accent); color: white; border: none; padding: 0 20px; height: 48px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; }
-    .search-box button:hover { background: var(--accent2); }
+    .search-box select { flex: 1; min-width: 130px; padding: 10px; border-radius: 10px; border: none; background: var(--surface2); color: var(--text); font-size: 0.85rem; cursor: pointer; }
+    .search-box button { background: var(--accent); color: white; border: none; padding: 0 16px; height: 42px; border-radius: 10px; font-weight: 600; cursor: pointer; }
 
-    .tabs { display: flex; gap: 4px; background: var(--surface); border-radius: 20px; padding: 4px; }
-    .tab { flex: 1; text-align: center; padding: 10px; border-radius: 16px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: 0.2s; }
+    .tabs { display: flex; gap: 4px; background: var(--surface); border-radius: 12px; padding: 4px; }
+    .tab { flex: 1; text-align: center; padding: 8px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem; color: var(--text2); }
     .tab.active { background: var(--accent); color: #fff; }
     .panel { display: none; }
     .panel.active { display: block; }
     
-    .filters { background: var(--surface); border-radius: 16px; padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
-    .music-list { display: flex; flex-direction: column; gap: 12px; }
-    .music-card { background: var(--surface); border-radius: 16px; padding: 16px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; transition: 0.2s; border-left: 4px solid transparent; }
-    .music-card.playing { border-left-color: var(--accent); background: var(--surface2); }
-    .music-cover { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; }
-    .music-info { flex: 1; min-width: 200px; }
-    .music-title { font-weight: 700; font-size: 1rem; }
-    .music-artist { color: var(--text2); font-size: 0.85rem; }
-    .music-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; font-size: 0.7rem; }
-    .badge { background: var(--surface2); padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
-    .stars { color: var(--star); }
-    .actions { display: flex; gap: 6px; flex-wrap: wrap; }
-    .actions button { background: var(--surface2); border: none; color: var(--text); padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; cursor: pointer; }
-    .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 24px; border-radius: 30px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999; }
+    .filters { background: var(--surface); border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    
+    /* Layout de Lista Compacta */
+    .music-list { display: flex; flex-direction: column; gap: 4px; background: var(--surface); border-radius: 12px; padding: 6px; }
+    .music-row { display: flex; align-items: center; justify-content: space-between; padding: 8px; border-radius: 8px; background: transparent; border-bottom: 1px solid #1c1c1c; gap: 10px; }
+    .music-row.playing { background: var(--surface2); border-left: 3px solid var(--accent); }
+    .music-row:last-child { border-bottom: none; }
+    
+    .row-main { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+    .row-cover { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
+    .row-details { min-width: 0; display: flex; flex-direction: column; }
+    .row-title { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .row-artist { color: var(--text2); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    
+    .row-actions { display: flex; gap: 4px; }
+    .row-btn { background: var(--surface2); border: none; color: var(--text); width: 32px; height: 32px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .row-btn.play { background: rgba(255, 85, 0, 0.15); color: var(--accent); font-weight: bold; }
+
+    .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: #222; border: 1px solid var(--accent); color: #fff; padding: 8px 18px; border-radius: 20px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1050; font-size: 0.85rem; }
     .toast.show { opacity: 1; }
-    .spinner { text-align: center; padding: 30px; }
-    .spinner::after { content: ''; display: inline-block; width: 30px; height: 30px; border: 3px solid var(--accent); border-top: 3px solid transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    .spinner { text-align: center; padding: 20px; }
+    .spinner::after { content: ''; display: inline-block; width: 24px; height: 24px; border: 2px solid var(--accent); border-top: 2px solid transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     
-    /* Novo Layout do Painel de Playlists */
-    .playlist-creation { display: flex; gap: 8px; width: 100%; margin-bottom: 12px; }
-    .playlist-creation input { flex: 1; padding: 10px; border-radius: 10px; border: none; background: var(--surface2); color: var(--text); }
-    .playlist-box { background: var(--surface); border-radius: 16px; padding: 16px; margin-bottom: 16px; }
-    .playlist-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 8px; margin-bottom: 8px; }
-    .playlist-track { display: flex; justify-content: space-between; font-size: 0.85rem; padding: 4px 0; color: var(--text2); }
+    /* Painel de Playlists */
+    .playlist-box { background: var(--surface); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+    .playlist-creation { display: flex; gap: 8px; width: 100%; }
+    .playlist-creation input { flex: 1; padding: 10px; border-radius: 8px; border: none; background: var(--surface2); color: var(--text); font-size: 0.9rem; }
+    .playlist-creation button { background: var(--accent); border: none; color: white; padding: 0 14px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
+    .playlist-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 6px; margin-bottom: 6px; font-size: 0.9rem; }
+    .playlist-track { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 4px 0; color: var(--text2); }
 
-    /* Barra do Player Fixo no Rodapé */
-    .bottom-player { position: fixed; bottom: 0; left: 0; right: 0; background: #111; border-top: 2px solid var(--accent); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; z-index: 1000; box-shadow: 0 -4px 20px rgba(0,0,0,0.8); }
+    /* Barra do Player Fixo no Rodapé (Posicionamento à Direita) */
+    .bottom-player { position: fixed; bottom: 0; left: 0; right: 0; background: #111; border-top: 2px solid var(--accent); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; z-index: 1000; box-shadow: 0 -4px 15px rgba(0,0,0,0.8); }
     .player-info { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
-    .player-info img { width: 40px; height: 40px; border-radius: 6px; }
+    .player-info img { width: 42px; height: 42px; border-radius: 6px; }
     .player-text { min-width: 0; }
-    .player-text .title { font-size: 0.9rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .player-text .title { font-size: 0.85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .player-text .artist { font-size: 0.75rem; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .player-controls { display: flex; align-items: center; gap: 12px; margin-left: 10px; }
-    .player-btn { background: var(--accent); color: white; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.9rem; font-weight: bold; }
-    .player-btn.secondary { background: var(--surface2); color: var(--text); }
-
-    @media (max-width: 500px) { .music-card { flex-direction: column; align-items: flex-start; } .search-box { flex-direction: column; } .search-box button { width: 100%; } }
+    .player-controls { display: flex; align-items: center; gap: 10px; margin-left: 12px; }
+    .player-btn { background: var(--accent); color: white; border: none; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.95rem; }
+    .player-btn.secondary { background: var(--surface2); color: var(--text); width: 34px; height: 34px; font-size: 0.85rem; }
   </style>
 </head>
 <body>
@@ -84,39 +87,37 @@
 
   <div class="search-container">
     <div class="search-box">
-      <input type="text" id="manualSearchInput" placeholder="🔍 Digite música, artista ou ano (ex: funk 2026)...">
+      <input type="text" id="manualSearchInput" placeholder="🔍 Música, artista ou ritmo...">
       <select id="genreFilter">
         <option value="">🎯 Todos os Estilos</option>
-        <option value="Funk Brasil">🔥 Funk (Geral)</option>
+        <option value="Funk">🔥 Funk</option>
         <option value="Mega Funk">🔊 Mega Funk</option>
-        <option value="Eletro Funk">⚡ Eletro Funk</option>
-        <option value="Sertanejo Pop">🤠 Sertanejo Pop</option>
-        <option value="Sertanejo Universitario">🎸 Sertanejo Univ.</option>
-        <option value="Eletronica Brasil">🪩 Eletrônica BR</option>
-        <option value="House Music">🎹 House Tracks</option>
+        <option value="Sertanejo">🤠 Sertanejo</option>
+        <option value="Eletronica">🪩 Eletrônica</option>
+        <option value="Pagode">🥁 Pagode</option>
       </select>
       <button id="manualSearchBtn">Buscar</button>
     </div>
   </div>
 
   <div class="tabs">
-    <div class="tab active" data-tab="hits">🔥 Hits do Momento</div>
-    <div class="tab" data-tab="oportunidades">📈 Oportunidades</div>
-    <div class="tab" data-tab="playlists">🎵 Meu Sets (Playlists)</div>
+    <div class="tab active" data-tab="hits">🔥 Descobertas</div>
+    <div class="tab" data-tab="oportunidades">📈 Tendências</div>
+    <div class="tab" data-tab="playlists">🎵 Meus Sets</div>
   </div>
 
   <div id="hits" class="panel active">
     <div class="filters">
-      <span id="hitsTitle" style="font-size: 0.85rem; color: var(--text2);">Atualização Automática (Spotify Brasil)</span>
-      <button id="refreshHits" style="background: var(--surface2); border: none; color: var(--text); padding: 8px 12px; border-radius: 10px; cursor: pointer;">🔄 Atualizar</button>
+      <span id="hitsTitle" style="font-size: 0.8rem; color: var(--text2);">Lista de reprodução ativa</span>
+      <button id="refreshHits" style="background: var(--surface2); border: none; color: var(--text); padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;">🔄 Atualizar</button>
     </div>
     <div id="hitsList" class="music-list"><div class="spinner"></div></div>
   </div>
 
   <div id="oportunidades" class="panel">
     <div class="filters">
-      <span style="font-size: 0.85rem; color: var(--text2);">Tendências & Virais em Alta</span>
-      <button id="refreshOpp" style="background: var(--surface2); border: none; color: var(--text); padding: 8px 12px; border-radius: 10px; cursor: pointer;">🔄 Atualizar</button>
+      <span style="font-size: 0.8rem; color: var(--text2);">Faixas virais em alta</span>
+      <button id="refreshOpp" style="background: var(--surface2); border: none; color: var(--text); padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;">🔄 Atualizar</button>
     </div>
     <div id="oppList" class="music-list"><div class="spinner"></div></div>
   </div>
@@ -124,8 +125,8 @@
   <div id="playlists" class="panel">
     <div class="playlist-box">
       <div class="playlist-creation">
-        <input type="text" id="newPlaylistName" placeholder="Nome do novo Set (ex: Warm-up Funk)">
-        <button id="createPlaylistBtn" style="background: var(--accent); border: none; color: white; padding: 0 16px; border-radius: 10px; cursor: pointer; font-weight: 600;">Criar Set</button>
+        <input type="text" id="newPlaylistName" placeholder="Nome do novo Set (ex: Pista Funk)">
+        <button id="createPlaylistBtn">Criar Set</button>
       </div>
     </div>
     <div id="playlistsList"></div>
@@ -134,62 +135,50 @@
   <div id="toast" class="toast"></div>
 </div>
 
-<!-- Player Fixo Inferior -->
 <div class="bottom-player">
   <div class="player-info">
     <img id="playerCover" src="https://i.imgur.com/3nFjQ4o.png" alt="">
     <div class="player-text">
       <div class="title" id="playerTitle">Nenhuma música tocando</div>
-      <div class="artist" id="playerArtist">Selecione uma prévia abaixo</div>
+      <div class="artist" id="playerArtist">Selecione uma faixa</div>
     </div>
   </div>
   <div class="player-controls">
-    <button class="player-btn" id="playerPlayPauseBtn">⏸</button>
+    <button class="player-btn" id="playerPlayPauseBtn">▶</button>
     <button class="player-btn secondary" id="playerNextBtn">⏭</button>
   </div>
 </div>
 
 <script>
 (function() {
-  const vercelUrl = 'https://v0-aplicativo-de-musicas-qst9nd3l7-djmarcelocruz-6348s-projects.vercel.app';
-  
-  let currentList = []; // Lista unificada ativa no player
+  let currentList = []; 
   let currentTrackIndex = -1;
   let ultimoTermoBuscado = "Top Hits Brasil";
   let playlists = JSON.parse(localStorage.getItem('djradar_playlists') || '[]');
   
   const audioContext = new Audio();
-
   const $ = (sel) => document.querySelector(sel);
-  const toast = (msg, dur=2500) => {
+  
+  const toast = (msg, dur=2000) => {
     const t = $('#toast'); t.textContent = msg; t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), dur);
   };
 
-  async function seguroFetch(url) {
-    const res = await fetch(`${vercelUrl}${url}`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
-  }
-
-  function mapearTrackSpotify(item) {
-    const popularity = item.popularity || 50;
-    let nota = 3;
-    if (popularity > 85) nota = 5;
-    else if (popularity > 70) nota = 4;
-    else if (popularity > 40) nota = 3;
-
-    return {
-      id: item.id,
-      title: item.name,
-      artist: item.artists?.map(a => a.name).join(', ') || 'Artista desconhecido',
-      albumCover: item.album?.images?.[0]?.url || 'https://i.imgur.com/3nFjQ4o.png',
-      preview: item.preview_url,
-      spotifyUrl: item.external_urls?.spotify,
-      popularity,
-      nota,
-      uso: popularity > 80 ? 'Pico da festa 🔥' : 'Manter pista cheia 🎶'
-    };
+  // BUSCA DIRETA DO ITUNES - ZERO ERROS DE CONEXÃO
+  async function buscarNoiTunes(termo) {
+    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(termo)}&media=music&limit=25&country=BR`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    
+    return data.results.map(item => ({
+      id: item.trackId.toString(),
+      title: item.trackName,
+      artist: item.artistName,
+      albumCover: item.artworkUrl100.replace('100x100bb', '300x300bb'),
+      preview: item.previewUrl,
+      externalUrl: item.trackViewUrl
+    }));
   }
 
   async function executarBuscaManual() {
@@ -197,22 +186,19 @@
     const estiloSelecionado = $('#genreFilter').value;
     let termoFinal = textoDigitado && estiloSelecionado ? `${textoDigitado} ${estiloSelecionado}` : estiloSelecionado || textoDigitado;
 
-    if (!termoFinal) { toast('Digite algo ou selecione um estilo!'); return; }
+    if (!termoFinal) { toast('Digite uma música ou estilo!'); return; }
     ultimoTermoBuscado = termoFinal;
 
     const list = $('#hitsList');
     $('#hitsTitle').textContent = `Resultados para: "${termoFinal}"`;
     list.innerHTML = '<div class="spinner"></div>';
-
     mudarAbaPara('hits');
 
     try {
-      const data = await seguroFetch(`/api/spotify?q=${encodeURIComponent(termoFinal)}`);
-      currentList = data.map(mapearTrackSpotify).sort((a, b) => b.popularity - a.popularity);
+      currentList = await buscarNoiTunes(termoFinal);
       renderTrackList(list, currentList);
-      toast(`Busca concluída no Spotify!`);
     } catch(e) {
-      list.innerHTML = `<p style="color:red;text-align:center;">Erro na busca: ${e.message}</p>`;
+      list.innerHTML = `<p style="color:red;text-align:center;font-size:0.85rem;padding:10px;">Erro ao buscar dados. Tente novamente.</p>`;
     }
   }
 
@@ -220,11 +206,10 @@
     const list = $('#hitsList');
     list.innerHTML = '<div class="spinner"></div>';
     try {
-      const data = await seguroFetch('/api/spotify?q=' + encodeURIComponent(ultimoTermoBuscado));
-      currentList = data.map(mapearTrackSpotify);
+      currentList = await buscarNoiTunes(ultimoTermoBuscado);
       renderTrackList(list, currentList);
     } catch(e) {
-      list.innerHTML = `<p style="color:red;text-align:center;">Erro no Spotify: ${e.message}</p>`;
+      list.innerHTML = `<p style="color:red;text-align:center;font-size:0.85rem;">Erro de conexão.</p>`;
     }
   }
 
@@ -232,11 +217,10 @@
     const list = $('#oppList');
     list.innerHTML = '<div class="spinner"></div>';
     try {
-      const data = await seguroFetch('/api/spotify?q=Viral%20Brasil');
-      const opps = data.map(mapearTrackSpotify).sort((a, b) => b.popularity - a.popularity);
+      const opps = await buscarNoiTunes('Viral Brasil');
       renderTrackList(list, opps, true);
     } catch(e) {
-      list.innerHTML = `<p style="color:red;text-align:center;">Erro nas tendências: ${e.message}</p>`;
+      list.innerHTML = `<p style="color:red;text-align:center;font-size:0.85rem;">Erro de conexão.</p>`;
     }
   }
 
@@ -248,42 +232,31 @@
   }
 
   function renderTrackList(container, tracks, esOportunidades = false) {
-    if (!tracks.length) { container.innerHTML = '<p style="text-align:center;color:#888;">Nenhuma música encontrada.</p>'; return; }
+    if (!tracks.length) { container.innerHTML = '<p style="text-align:center;color:#888;font-size:0.85rem;padding:10px;">Nenhuma faixa encontrada.</p>'; return; }
+    
     container.innerHTML = tracks.map((t, idx) => {
-      const stars = '⭐'.repeat(t.nota) + '☆'.repeat(5 - t.nota);
       const isActiva = currentTrackIndex === idx && !esOportunidades;
       return `
-        <div class="music-card ${isActiva ? 'playing' : ''}" id="card-${esOportunidades ? 'opp' : 'hits'}-${idx}">
-          <img class="music-cover" src="${t.albumCover}" alt="">
-          <div class="music-info">
-            <div class="music-title">${t.title}</div>
-            <div class="music-artist">${t.artist}</div>
-            <div class="music-meta">
-              <span class="badge">📊 Pop: ${t.popularity}%</span>
-              <span class="badge">${t.uso}</span>
-              ${!t.preview ? '<span class="badge" style="color:#ffaa00;">⚠️ Sem Prévia</span>' : ''}
+        <div class="music-row ${isActiva ? 'playing' : ''}" id="row-${esOportunidades ? 'opp' : 'hits'}-${idx}">
+          <div class="row-main" onclick="gerenciarPlayer(${idx}, ${esOportunidades})">
+            <img class="row-cover" src="${t.albumCover}" alt="">
+            <div class="row-details">
+              <div class="row-title">${t.title}</div>
+              <div class="row-artist">${t.artist}</div>
             </div>
-            <div class="stars" style="margin-top:4px;">${stars}</div>
           </div>
-          <div class="actions">
-            <button onclick="gerenciarPlayer(${idx}, ${esOportunidades})">▶ Ouvir</button>
-            <button onclick="window.open('${t.spotifyUrl || '#'}','_blank')">🎵 Spotify</button>
-            <button onclick="abrirYouTube('${t.title.replace(/'/g, "")}', '${t.artist.replace(/'/g, "")}')">🎬 Clipe</button>
-            <button onclick="abrirModalAdicionar('${t.id}', ${esOportunidades})">➕ Adicionar</button>
+          <div class="row-buttons">
+            <button class="row-btn" onclick="abrirModalAdicionar('${t.id}', ${esOportunidades})" title="Adicionar ao Set">➕</button>
           </div>
         </div>`;
     }).join('');
   }
 
-  // LÓGICA DO MAESTRO DE ÁUDIO SEQUENCIAL
   window.gerenciarPlayer = function(index, esOportunidades) {
     if (esOportunidades) {
-      // Se clicou na aba de oportunidades, atualizamos a lista do player para ser ela
-      const list = $('#oppList');
-      // Copia temporariamente para a lista ativa do player
-      currentList = Array.from(document.querySelectorAll('#oppList .music-card')).map((_, i) => currentList[i]); 
+      toast('Carregando lista de tendências...');
+      return; 
     }
-    
     tocarFaixa(index);
   };
 
@@ -296,19 +269,15 @@
     currentTrackIndex = index;
     const track = currentList[index];
 
-    // Atualiza classes visuais nas listas
-    document.querySelectorAll('.music-card').forEach(c => c.classList.remove('playing'));
-    const cardHits = $(`#card-hits-${index}`);
-    if (cardHits) cardHits.classList.add('playing');
+    document.querySelectorAll('.music-row').forEach(r => r.classList.remove('playing'));
+    const rowHits = $(`#row-hits-${index}`);
+    if (rowHits) rowHits.classList.add('playing');
 
-    // Se não houver link de áudio da prévia, pula automaticamente para a próxima
     if (!track.preview) {
-      console.log(`Faixa "${track.title}" sem áudio. Pulando automaticamente...`);
       tocarFaixa(index + 1);
       return;
     }
 
-    // Atualiza Barra de Controle Fixa no Rodapé
     $('#playerCover').src = track.albumCover;
     $('#playerTitle').textContent = track.title;
     $('#playerArtist').textContent = track.artist;
@@ -316,41 +285,34 @@
 
     audioContext.src = track.preview;
     audioContext.play()
-      .then(() => toast(`Tocando: ${track.title}`))
-      .catch(() => {
-        toast("Erro no áudio, pulando...");
-        tocarFaixa(index + 1);
-      });
+      .catch(() => tocarFaixa(index + 1));
   }
 
-  // MODOS DE REPRODUÇÃO INFINITA AUTOMÁTICA
   audioContext.onended = function() {
     tocarFaixa(currentTrackIndex + 1);
   };
 
-  async function ativarModoRadio() {
-    toast("Fim da lista atingido! Buscando mais músicas parecidas...");
+  async function activarModoRadio() {
+    toast("Fim da lista! Misturando novas tracks...");
     try {
-      // Modo Rádio por Afinidade inteligente: repete a busca usando o gênero do filtro ou o último termo
-      const data = await seguroFetch(`/api/spotify?q=${encodeURIComponent(ultimoTermoBuscado)}`);
-      if (data && data.length) {
-        currentList = data.map(mapearTrackSpotify).sort(() => Math.random() - 0.5); // Embaralha para parecer rádio
-        renderTrackList($('#hitsList'), currentList);
-        tocarFaixa(0);
-      }
+      currentList = await buscarNoiTunes(ultimoTermoBuscado);
+      currentList.sort(() => Math.random() - 0.5);
+      renderTrackList($('#hitsList'), currentList);
+      tocarFaixa(0);
     } catch(e) {
-      toast("Não foi possível carregar o modo rádio.");
+      toast("Fim da sequência.");
     }
   }
 
-  // Controles do player fixo
   $('#playerPlayPauseBtn').addEventListener('click', () => {
-    if (audioContext.paused) {
-      audioContext.play();
-      $('#playerPlayPauseBtn').textContent = "⏸";
-    } else {
-      audioContext.pause();
-      $('#playerPlayPauseBtn').textContent = "▶";
+    if (audioContext.src) {
+      if (audioContext.paused) {
+        audioContext.play();
+        $('#playerPlayPauseBtn').textContent = "⏸";
+      } else {
+        audioContext.pause();
+        $('#playerPlayPauseBtn').textContent = "▶";
+      }
     }
   });
 
@@ -358,15 +320,11 @@
     tocarFaixa(currentTrackIndex + 1);
   });
 
-  window.abrirYouTube = function(titulo, artista) {
-    window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(artista + ' ' + titulo + ' clipe oficial')}`, '_blank');
-  };
-
-  // BANCO DE DADOS E GERENCIAMENTO AVANÇADO DE PLAYLISTS (SETS)
+  // SISTEMA GERENCIADOR DE PLAYLISTS
   $('#createPlaylistBtn').addEventListener('click', () => {
     const nome = $('#newPlaylistName').value.trim();
     if (!nome) { toast('Digite o nome do set!'); return; }
-    if (playlists.some(p => p.name.toLowerCase() === nome.toLowerCase())) { toast('Este set já existe!'); return; }
+    if (playlists.some(p => p.name.toLowerCase() === nome.toLowerCase())) { toast('Esse set já existe!'); return; }
     
     playlists.push({ name: nome, tracks: [] });
     localStorage.setItem('djradar_playlists', JSON.stringify(playlists));
@@ -376,11 +334,10 @@
   });
 
   window.abrirModalAdicionar = function(trackId, esOportunidades) {
-    if (!playlists.length) { toast('Crie um Set primeiro na aba de Playlists!'); return; }
+    if (!playlists.length) { toast('Crie um Set na aba "Meus Sets" primeiro!'); return; }
     
-    // Procura qual o nome da playlist que o usuário deseja adicionar
-    let opcoes = playlists.map((p, i) => `${i + 1} - ${p.name}`).join('\n');
-    let escolha = prompt(`Digite o NÚMERO do Set para adicionar esta música:\n\n${opcoes}`);
+    let opcoes = playlists.map((p, i) => `${i + 1}: ${p.name}`).join('\n');
+    let escolha = prompt(`Digite o número do Set para salvar a música:\n\n${opcoes}`);
     
     if (!escolha) return;
     let idx = parseInt(escolha) - 1;
@@ -389,42 +346,42 @@
       const track = currentList.find(t => t.id === trackId);
       if (!track) return;
       
-      if (playlists[idx].tracks.some(t => t.id === trackId)) { toast('Música já está nesse Set'); return; }
+      if (playlists[idx].tracks.some(t => t.id === trackId)) { toast('Essa track já está no Set!'); return; }
       
       playlists[idx].tracks.push(track);
       localStorage.setItem('djradar_playlists', JSON.stringify(playlists));
-      toast(`Adicionada ao Set: ${playlists[idx].name}`);
+      toast(`Salva em: ${playlists[idx].name}`);
     } else {
-      toast('Opção inválida.');
+      toast('Número inválido.');
     }
   };
 
   function renderPlaylists() {
     const container = $('#playlistsList');
-    if (!playlists.length) { container.innerHTML = '<p style="text-align:center;color:#888;padding:20px;">Nenhum set salvo no celular.</p>'; return; }
+    if (!playlists.length) { container.innerHTML = '<p style="text-align:center;color:#888;font-size:0.85rem;padding:15px;">Nenhum set criado no celular.</p>'; return; }
     
     container.innerHTML = playlists.map((pl, i) => `
       <div class="playlist-box">
         <div class="playlist-header">
           <strong>📂 ${pl.name}</strong>
-          <span style="font-size:0.8rem;color:var(--text2);">${pl.tracks.length} tracks</span>
-          <button onclick="deletarPlaylist(${i})" style="background:none;border:none;color:#ff3333;cursor:pointer;">🗑️ Excluir</button>
+          <span style="color:var(--text2);font-size:0.75rem;">${pl.tracks.length} tracks</span>
+          <button onclick="deletarPlaylist(${i})" style="background:none;border:none;color:#ff3333;font-size:0.75rem;cursor:pointer;">Excluir</button>
         </div>
-        <div style="max-height:150px; overflow-y:auto; margin-bottom:10px;">
+        <div style="max-height:120px; overflow-y:auto; margin-bottom:8px;">
           ${pl.tracks.map((t, idx) => `
             <div class="playlist-track">
               <span>${idx+1}. ${t.artist} - ${t.title}</span>
-              <button onclick="removerFaixa(${i}, ${idx})" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:0.7rem;">❌</button>
+              <button onclick="removerFaixa(${i}, ${idx})" style="background:none;border:none;color:#ff5500;font-size:0.7rem;cursor:pointer;">❌</button>
             </div>
-          `).join('') || '<p style="font-size:0.8rem;color:#666;">Set vazio.</p>'}
+          `).join('') || '<p style="font-size:0.75rem;color:#555;padding:4px 0;">Set vazio.</p>'}
         </div>
-        <button onclick="copiarTxtSet(${i})" style="width:100%; padding:8px; background:var(--surface2); border:1px solid var(--accent); color:white; border-radius:8px; font-size:0.8rem; cursor:pointer; font-weight:600;">📋 Copiar Set (Formato Texto Limpo)</button>
+        <button onclick="copiarTxtSet(${i})" style="width:100%; padding:6px; background:var(--surface2); border:1px solid var(--accent); color:white; border-radius:6px; font-size:0.75rem; cursor:pointer;">📋 Copiar Lista (Texto Limpo)</button>
       </div>
     `).join('');
   }
 
   window.deletarPlaylist = function(idx) {
-    if(confirm(`Tem certeza que quer apagar o set "${playlists[idx].name}"?`)) {
+    if(confirm(`Apagar o set "${playlists[idx].name}"?`)) {
       playlists.splice(idx, 1);
       localStorage.setItem('djradar_playlists', JSON.stringify(playlists));
       renderPlaylists();
@@ -435,21 +392,17 @@
     playlists[pIdx].tracks.splice(tIdx, 1);
     localStorage.setItem('djradar_playlists', JSON.stringify(playlists));
     renderPlaylists();
-    toast('Faixa removida do set.');
   };
 
   window.copiarTxtSet = function(idx) {
     const pl = playlists[idx];
-    if (!pl.tracks.length) { toast('Este set está vazio!'); return; }
-    
+    if (!pl.tracks.length) { toast('Set vazio!'); return; }
     let textoLimpo = pl.tracks.map((t, i) => `${i + 1}. ${t.artist} - ${t.title}`).join('\n');
-    
     navigator.clipboard.writeText(textoLimpo)
-      .then(() => toast('Lista copiada! Cole no bloco de notas ou software de DJ.'))
-      .catch(() => toast('Erro ao copiar texto.'));
+      .then(() => toast('Copiado! Cole no seu software de DJ.'))
+      .catch(() => toast('Erro ao copiar.'));
   };
 
-  // Gerenciamento de Abas
   document.querySelectorAll('.tab').forEach(tab => {
     tab.addEventListener('click', () => {
       mudarAbaPara(tab.dataset.tab);
@@ -461,11 +414,9 @@
 
   $('#manualSearchBtn').addEventListener('click', executarBuscaManual);
   $('#manualSearchInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') executarBuscaManual(); });
-  $('#genreFilter').addEventListener('change', executarBuscaManual);
   $('#refreshHits').addEventListener('click', () => loadHits());
   $('#refreshOpp').addEventListener('click', () => loadOportunidades());
 
-  // Início automático
   loadHits();
 })();
 </script>
