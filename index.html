@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>DJ Radar – Descoberta Musical</title>
-  <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22DJ%20Radar%22%2C%22short_name%22%3A%22Radar%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230a0a0a%22%2C%22theme_color%22%3A%22%23ff5500%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ccircle%20cx%3D'50'%20cy%3D'50'%20r%3D'50'%20fill%3D'%23ff5500'%2F%3E%3Ctext%20x%3D'50'%20y%3D'65'%20text-anchor%3D'middle'%20fill%3D'white'%20font-size%3D'40'%3E%E2%99%AB%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22100x100%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D" />
+  <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22DJ%20Radar%22%2C%22short_name%22%3A%22Radar%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230a0a0a%22%2C%22theme_color%22%3A%22%23ff5500%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%100%20100'%3E%3Ccircle%20cx%3D'50'%20cy%3D'50'%20r%3D'50'%20fill%3D'%23ff5500'%2F%3E%3Ctext%20x%3D'50'%20y%3D'65'%20text-anchor%3D'middle'%20fill%3D'white'%20font-size%3D'40'%3E%E2%99%AB%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22100x100%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D" />
   <style>
     :root {
       --bg: #0a0a0a;
@@ -21,6 +21,14 @@
     .app { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
     header { display: flex; justify-content: space-between; align-items: center; }
     h1 { font-size: 1.8rem; font-weight: 700; background: linear-gradient(135deg, var(--accent), #ffaa00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    
+    /* Estilos do Super Buscador */
+    .search-box { display: flex; gap: 8px; background: var(--surface); padding: 12px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+    .search-box input { flex: 1; padding: 12px; border-radius: 12px; border: none; background: var(--surface2); color: var(--text); font-size: 1rem; font-weight: 500; }
+    .search-box input:focus { outline: 2px solid var(--accent); }
+    .search-box button { background: var(--accent); color: white; border: none; padding: 0 20px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .search-box button:hover { background: var(--accent2); }
+
     .tabs { display: flex; gap: 4px; background: var(--surface); border-radius: 20px; padding: 4px; }
     .tab { flex: 1; text-align: center; padding: 10px; border-radius: 16px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: 0.2s; }
     .tab.active { background: var(--accent); color: #fff; }
@@ -55,6 +63,12 @@
     <h1>📡 DJ Radar</h1>
   </header>
 
+  <!-- Super Barra de Pesquisa Manual -->
+  <div class="search-box">
+    <input type="text" id="manualSearchInput" placeholder="🔍 Digite uma música, artista ou estilo (ex: Eletro Funk)...">
+    <button id="manualSearchBtn">Buscar</button>
+  </div>
+
   <div class="tabs">
     <div class="tab active" data-tab="hits">🔥 Hits do Momento</div>
     <div class="tab" data-tab="oportunidades">📈 Oportunidades</div>
@@ -63,23 +77,16 @@
 
   <div id="hits" class="panel active">
     <div class="filters">
-      <select id="hitsPeriod">
-        <option value="7">Últimos 7 dias</option>
-        <option value="30" selected>Últimos 30 dias</option>
-        <option value="90">Últimos 90 dias</option>
-      </select>
-      <button id="refreshHits" class="btn-secondary">🔄 Atualizar</button>
+      <span id="hitsTitle" style="font-size: 0.85rem; color: var(--text2);">Atualização Automática (Spotify Brasil)</span>
+      <button id="refreshHits" class="btn-secondary" style="background: var(--surface2); border: none; color: var(--text); padding: 8px 12px; border-radius: 10px; cursor: pointer;">🔄 Atualizar</button>
     </div>
     <div id="hitsList" class="music-list"><div class="spinner"></div></div>
   </div>
 
   <div id="oportunidades" class="panel">
     <div class="filters">
-      <select id="oppPeriod">
-        <option value="30">Últimos 30 dias</option>
-        <option value="90" selected>Últimos 90 dias</option>
-      </select>
-      <button id="refreshOpp" class="btn-secondary">🔄 Atualizar</button>
+      <span style="font-size: 0.85rem; color: var(--text2);">Tendências & Virais em Alta</span>
+      <button id="refreshOpp" class="btn-secondary" style="background: var(--surface2); border: none; color: var(--text); padding: 8px 12px; border-radius: 10px; cursor: pointer;">🔄 Atualizar</button>
     </div>
     <div id="oppList" class="music-list"><div class="spinner"></div></div>
   </div>
@@ -92,7 +99,7 @@
         <option value="Boteco">🍺 Boteco</option>
         <option value="Balada">🪩 Balada</option>
       </select>
-      <button id="createPlaylistBtn" class="btn-primary">Nova Playlist</button>
+      <button id="createPlaylistBtn" class="btn-primary" style="background: var(--accent); border: none; color: white; padding: 8px 12px; border-radius: 10px; cursor: pointer;">Nova Playlist</button>
     </div>
     <div id="playlistsList"></div>
   </div>
@@ -117,92 +124,119 @@
     return await res.json();
   }
 
-  function mapearTrack(track) {
-    const item = track.track || track;
-    const releaseDate = item.release_date || item.album?.release_date || '2026-01-01';
-    const ageDays = Math.max(1, (Date.now() - new Date(releaseDate).getTime()) / 86400000);
+  function mapearTrackSpotify(item) {
+    const popularity = item.popularity || 50;
     
-    const rawRank = item.rank || 500000;
-    const popularity = Math.min(100, Math.max(10, Math.round((rawRank / 1000000) * 100)));
-
     let nota = 3;
     if (popularity > 85) nota = 5;
     else if (popularity > 70) nota = 4;
     else if (popularity > 40) nota = 3;
 
-    const uso = popularity > 80 && ageDays < 180 ? 'Pico da festa 🔥' : 'Manter pista cheia 🎶';
+    const uso = popularity > 80 ? 'Pico da festa 🔥' : 'Manter pista cheia 🎶';
 
     return {
       id: item.id,
-      title: item.title_short || item.title,
-      artist: item.artist?.name || 'Artista desconhecido',
-      albumCover: item.album?.cover_medium || '',
-      preview: item.preview,
-      deezerUrl: item.link,
-      releaseDate,
+      title: item.name,
+      artist: item.artists?.map(a => a.name).join(', ') || 'Artista desconhecido',
+      albumCover: item.album?.images?.[0]?.url || 'https://i.imgur.com/3nFjQ4o.png',
+      preview: item.preview_url,
+      spotifyUrl: item.external_urls?.spotify,
       popularity,
       nota,
-      uso,
-      ageDays: Math.round(ageDays)
+      uso
     };
   }
 
-  async function loadHits(days=30) {
+  // Função do Super Buscador Manual
+  async function executarBuscaManual() {
+    const termo = $('#manualSearchInput').value.trim();
+    if (!termo) {
+      toast('Digite algo para buscar!');
+      return;
+    }
+
+    // Ativa a aba de hits para exibir os resultados da busca nela
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelector('[data-tab="hits"]').classList.add('active');
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    $('#hits').classList.add('active');
+
     const list = $('#hitsList');
+    $('#hitsTitle').textContent = `Resultados para: "${termo}"`;
     list.innerHTML = '<div class="spinner"></div>';
+
     try {
-      const data = await seguroFetch('/api/hits');
-      if (!data?.tracks?.data) throw new Error('Formato inválido');
-      let tracks = data.tracks.data.map(mapearTrack);
-      currentHits = tracks;
+      const data = await seguroFetch(`/api/spotify?q=${encodeURIComponent(termo)}`);
+      if (!Array.isArray(data)) throw new Error('Formato inválido');
+      
+      currentHits = data.map(mapearTrackSpotify);
+      // Ordena o resultado colocando as mais relevantes/bombadas da busca no topo
+      currentHits.sort((a, b) => b.popularity - a.popularity);
+      
       renderTrackList(list, currentHits);
+      toast(`Busca concluída! ${currentHits.length} faixas encontradas.`);
     } catch(e) {
-      list.innerHTML = '<p style="color:red;text-align:center;">Erro ao carregar hits.</p>';
+      console.error(e);
+      list.innerHTML = '<p style="color:red;text-align:center;">Erro ao realizar busca no Spotify.</p>';
     }
   }
 
-  async function loadOportunidades(days=90) {
+  async function loadHits() {
+    const list = $('#hitsList');
+    $('#hitsTitle').textContent = 'Atualização Automática (Spotify Brasil)';
+    list.innerHTML = '<div class="spinner"></div>';
+    try {
+      const data = await seguroFetch('/api/spotify?q=Top%20Hits%20Brasil');
+      if (!Array.isArray(data)) throw new Error('Formato inválido');
+      
+      currentHits = data.map(mapearTrackSpotify);
+      renderTrackList(list, currentHits);
+    } catch(e) {
+      console.error(e);
+      list.innerHTML = '<p style="color:red;text-align:center;">Erro ao carregar os hits do Spotify.</p>';
+    }
+  }
+
+  async function loadOportunidades() {
     const list = $('#oppList');
     list.innerHTML = '<div class="spinner"></div>';
     try {
-      const data = await seguroFetch('/api/oportunidades');
-      if (!data?.data) throw new Error('Formato inválido');
-      let tracks = data.data.map(mapearTrack);
+      const data = await seguroFetch('/api/spotify?q=Viral%20Brasil');
+      if (!Array.isArray(data)) throw new Error('Formato inválido');
       
-      tracks.sort((a, b) => (b.popularity / (b.ageDays * 0.1 + 1)) - (a.popularity / (a.ageDays * 0.1 + 1)));
+      currentOpps = data.map(mapearTrackSpotify);
+      currentOpps.sort((a, b) => b.popularity - a.popularity);
       
-      currentOpps = tracks;
       renderTrackList(list, currentOpps);
     } catch(e) {
-      list.innerHTML = '<p style="color:red;text-align:center;">Erro ao carregar oportunidades.</p>';
+      console.error(e);
+      list.innerHTML = '<p style="color:red;text-align:center;">Erro ao carregar as tendências do Spotify.</p>';
     }
   }
 
   function renderTrackList(container, tracks) {
-    if (!tracks.length) { container.innerHTML = '<p style="text-align:center;color:#888;">Nenhuma música.</p>'; return; }
+    if (!tracks.length) { container.innerHTML = '<p style="text-align:center;color:#888;">Nenhuma música encontrada.</p>'; return; }
     container.innerHTML = tracks.map(t => {
       const stars = '⭐'.repeat(t.nota) + '☆'.repeat(5 - t.nota);
       
-      // Escapa aspas simples para evitar quebras no onClick JavaScript
       const tituloEscapado = t.title.replace(/'/g, "\\'");
       const artistaEscapado = t.artist.replace(/'/g, "\\'");
 
       return `
         <div class="music-card">
-          <img class="music-cover" src="${t.albumCover || 'https://i.imgur.com/3nFjQ4o.png'}" alt="">
+          <img class="music-cover" src="${t.albumCover}" alt="">
           <div class="music-info">
             <div class="music-title">${t.title}</div>
             <div class="music-artist">${t.artist}</div>
             <div class="music-meta">
-              <span class="badge">📅 ${t.releaseDate}</span>
               <span class="badge">📊 Pop: ${t.popularity}%</span>
               <span class="badge">${t.uso}</span>
             </div>
             <div class="stars" style="margin-top:4px;">${stars}</div>
           </div>
           <div class="actions">
-            <button onclick="playPreview('${t.preview}')" ${!t.preview?'disabled':''}>▶ Prévia</button>
-            <button onclick="window.open('${t.deezerUrl}','_blank')">🎧 Deezer</button>
+            <button onclick="playPreview('${t.preview || ''}')" ${!t.preview?'disabled style="opacity:0.5;cursor:not-allowed;"':''}>▶ Prévia</button>
+            <button onclick="window.open('${t.spotifyUrl || '#'}','_blank')">🎵 Spotify</button>
             <button onclick="verClipeNoYouTube('${tituloEscapado}', '${artistaEscapado}')">🎬 Clipe</button>
             <button onclick="addToPlaylist('${t.id}')">➕ Playlist</button>
           </div>
@@ -211,9 +245,12 @@
   }
 
   window.playPreview = function(url) {
-    if (!url) return;
+    if (!url) {
+      toast('Prévia indisponível para esta faixa no Spotify');
+      return;
+    }
     const audio = new Audio(url);
-    audio.play().catch(() => toast('Prévia indisponível'));
+    audio.play().catch(() => toast('Erro ao reproduzir prévia'));
   };
 
   window.verClipeNoYouTube = async function(titulo, artista) {
@@ -260,10 +297,10 @@
       <div style="margin-bottom:16px; background:var(--surface); padding:12px; border-radius:12px;">
         <div class="playlist-item">
           <strong>${pl.name}</strong> (${pl.tracks.length} músicas)
-          <button onclick="deletePlaylist(${i})" class="btn-secondary" style="padding:4px 10px;">🗑️</button>
+          <button onclick="deletePlaylist(${i})" class="btn-secondary" style="padding:4px 10px; background:none; border:none; color:red; cursor:pointer;">🗑️</button>
         </div>
         <div style="margin-top:8px;">
-          <button onclick="exportPlaylist(${i}, 'txt')" class="btn-primary" style="font-size:0.8rem; padding:4px 8px;">📋 Copiar TXT</button>
+          <button onclick="exportPlaylist(${i}, 'txt')" class="btn-primary" style="font-size:0.8rem; padding:4px 8px; background:var(--accent); border:none; color:white; border-radius:10px; cursor:pointer;">📋 Copiar TXT</button>
         </div>
       </div>
     `).join('');
@@ -294,6 +331,12 @@
       if (tab.dataset.tab === 'oportunidades' && !currentOpps.length) loadOportunidades();
       if (tab.dataset.tab === 'playlists') renderPlaylists();
     });
+  });
+
+  // Eventos do Buscador Manual
+  $('#manualSearchBtn').addEventListener('click', executarBuscaManual);
+  $('#manualSearchInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') executarBuscaManual();
   });
 
   $('#refreshHits').addEventListener('click', () => loadHits());
