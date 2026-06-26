@@ -17,7 +17,7 @@
       --star: #ffd600;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 16px; }
+    body { font-family: 'Inter', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 16px; padding-bottom: 100px; }
     .app { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
     header { display: flex; justify-content: space-between; align-items: center; }
     h1 { font-size: 1.8rem; font-weight: 700; background: linear-gradient(135deg, var(--accent), #ffaa00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -35,11 +35,11 @@
     .tab.active { background: var(--accent); color: #fff; }
     .panel { display: none; }
     .panel.active { display: block; }
-    .filters { background: var(--surface); border-radius: 16px; padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-    .filters select, .filters input { padding: 8px 12px; border-radius: 10px; border: none; background: var(--surface2); color: var(--text); font-size: 0.85rem; }
+    
+    .filters { background: var(--surface); border-radius: 16px; padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
     .music-list { display: flex; flex-direction: column; gap: 12px; }
     .music-card { background: var(--surface); border-radius: 16px; padding: 16px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; transition: 0.2s; border-left: 4px solid transparent; }
-    .music-card:hover { border-left-color: var(--accent); background: var(--surface2); }
+    .music-card.playing { border-left-color: var(--accent); background: var(--surface2); }
     .music-cover { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; }
     .music-info { flex: 1; min-width: 200px; }
     .music-title { font-weight: 700; font-size: 1rem; }
@@ -49,12 +49,30 @@
     .stars { color: var(--star); }
     .actions { display: flex; gap: 6px; flex-wrap: wrap; }
     .actions button { background: var(--surface2); border: none; color: var(--text); padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; cursor: pointer; }
-    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 24px; border-radius: 30px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999; }
+    .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 24px; border-radius: 30px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999; }
     .toast.show { opacity: 1; }
     .spinner { text-align: center; padding: 30px; }
     .spinner::after { content: ''; display: inline-block; width: 30px; height: 30px; border: 3px solid var(--accent); border-top: 3px solid transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .playlist-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #222; }
+    
+    /* Novo Layout do Painel de Playlists */
+    .playlist-creation { display: flex; gap: 8px; width: 100%; margin-bottom: 12px; }
+    .playlist-creation input { flex: 1; padding: 10px; border-radius: 10px; border: none; background: var(--surface2); color: var(--text); }
+    .playlist-box { background: var(--surface); border-radius: 16px; padding: 16px; margin-bottom: 16px; }
+    .playlist-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 8px; margin-bottom: 8px; }
+    .playlist-track { display: flex; justify-content: space-between; font-size: 0.85rem; padding: 4px 0; color: var(--text2); }
+
+    /* Barra do Player Fixo no Rodapé */
+    .bottom-player { position: fixed; bottom: 0; left: 0; right: 0; background: #111; border-top: 2px solid var(--accent); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; z-index: 1000; box-shadow: 0 -4px 20px rgba(0,0,0,0.8); }
+    .player-info { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+    .player-info img { width: 40px; height: 40px; border-radius: 6px; }
+    .player-text { min-width: 0; }
+    .player-text .title { font-size: 0.9rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .player-text .artist { font-size: 0.75rem; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .player-controls { display: flex; align-items: center; gap: 12px; margin-left: 10px; }
+    .player-btn { background: var(--accent); color: white; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.9rem; font-weight: bold; }
+    .player-btn.secondary { background: var(--surface2); color: var(--text); }
+
     @media (max-width: 500px) { .music-card { flex-direction: column; align-items: flex-start; } .search-box { flex-direction: column; } .search-box button { width: 100%; } }
   </style>
 </head>
@@ -66,7 +84,7 @@
 
   <div class="search-container">
     <div class="search-box">
-      <input type="text" id="manualSearchInput" placeholder="🔍 Digite música, artista ou use o filtro...">
+      <input type="text" id="manualSearchInput" placeholder="🔍 Digite música, artista ou ano (ex: funk 2026)...">
       <select id="genreFilter">
         <option value="">🎯 Todos os Estilos</option>
         <option value="Funk Brasil">🔥 Funk (Geral)</option>
@@ -84,13 +102,13 @@
   <div class="tabs">
     <div class="tab active" data-tab="hits">🔥 Hits do Momento</div>
     <div class="tab" data-tab="oportunidades">📈 Oportunidades</div>
-    <div class="tab" data-tab="playlists">🎵 Playlists</div>
+    <div class="tab" data-tab="playlists">🎵 Meu Sets (Playlists)</div>
   </div>
 
   <div id="hits" class="panel active">
     <div class="filters">
       <span id="hitsTitle" style="font-size: 0.85rem; color: var(--text2);">Atualização Automática (Spotify Brasil)</span>
-      <button id="refreshHits" class="btn-secondary" style="background: var(--surface2); border: none; color: var(--text); padding: 8px 12px; border-radius: 10px; cursor: pointer;">🔄 Atualizar</button>
+      <button id="refreshHits" style="background: var(--surface2); border: none; color: var(--text); padding: 8px 12px; border-radius: 10px; cursor: pointer;">🔄 Atualizar</button>
     </div>
     <div id="hitsList" class="music-list"><div class="spinner"></div></div>
   </div>
@@ -98,20 +116,17 @@
   <div id="oportunidades" class="panel">
     <div class="filters">
       <span style="font-size: 0.85rem; color: var(--text2);">Tendências & Virais em Alta</span>
-      <button id="refreshOpp" class="btn-secondary" style="background: var(--surface2); border: none; color: var(--text); padding: 8px 12px; border-radius: 10px; cursor: pointer;">🔄 Atualizar</button>
+      <button id="refreshOpp" style="background: var(--surface2); border: none; color: var(--text); padding: 8px 12px; border-radius: 10px; cursor: pointer;">🔄 Atualizar</button>
     </div>
     <div id="oppList" class="music-list"><div class="spinner"></div></div>
   </div>
 
   <div id="playlists" class="panel">
-    <div class="filters">
-      <select id="playlistTemplate">
-        <option value="">Criar playlist...</option>
-        <option value="Casamento">💒 Casamento</option>
-        <option value="Boteco">🍺 Boteco</option>
-        <option value="Balada">🪩 Balada</option>
-      </select>
-      <button id="createPlaylistBtn" class="btn-primary" style="background: var(--accent); border: none; color: white; padding: 8px 12px; border-radius: 10px; cursor: pointer;">Nova Playlist</button>
+    <div class="playlist-box">
+      <div class="playlist-creation">
+        <input type="text" id="newPlaylistName" placeholder="Nome do novo Set (ex: Warm-up Funk)">
+        <button id="createPlaylistBtn" style="background: var(--accent); border: none; color: white; padding: 0 16px; border-radius: 10px; cursor: pointer; font-weight: 600;">Criar Set</button>
+      </div>
     </div>
     <div id="playlistsList"></div>
   </div>
@@ -119,10 +134,31 @@
   <div id="toast" class="toast"></div>
 </div>
 
+<!-- Player Fixo Inferior -->
+<div class="bottom-player">
+  <div class="player-info">
+    <img id="playerCover" src="https://i.imgur.com/3nFjQ4o.png" alt="">
+    <div class="player-text">
+      <div class="title" id="playerTitle">Nenhuma música tocando</div>
+      <div class="artist" id="playerArtist">Selecione uma prévia abaixo</div>
+    </div>
+  </div>
+  <div class="player-controls">
+    <button class="player-btn" id="playerPlayPauseBtn">⏸</button>
+    <button class="player-btn secondary" id="playerNextBtn">⏭</button>
+  </div>
+</div>
+
 <script>
 (function() {
-  let currentHits = [], currentOpps = [];
+  const vercelUrl = 'https://v0-aplicativo-de-musicas-qst9nd3l7-djmarcelocruz-6348s-projects.vercel.app';
+  
+  let currentList = []; // Lista unificada ativa no player
+  let currentTrackIndex = -1;
+  let ultimoTermoBuscado = "Top Hits Brasil";
   let playlists = JSON.parse(localStorage.getItem('djradar_playlists') || '[]');
+  
+  const audioContext = new Audio();
 
   const $ = (sel) => document.querySelector(sel);
   const toast = (msg, dur=2500) => {
@@ -131,20 +167,17 @@
   };
 
   async function seguroFetch(url) {
-    const res = await fetch(url);
+    const res = await fetch(`${vercelUrl}${url}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   }
 
   function mapearTrackSpotify(item) {
     const popularity = item.popularity || 50;
-    
     let nota = 3;
     if (popularity > 85) nota = 5;
     else if (popularity > 70) nota = 4;
     else if (popularity > 40) nota = 3;
-
-    const uso = popularity > 80 ? 'Pico da festa 🔥' : 'Manter pista cheia 🎶';
 
     return {
       id: item.id,
@@ -155,64 +188,43 @@
       spotifyUrl: item.external_urls?.spotify,
       popularity,
       nota,
-      uso
+      uso: popularity > 80 ? 'Pico da festa 🔥' : 'Manter pista cheia 🎶'
     };
   }
 
   async function executarBuscaManual() {
     const textoDigitado = $('#manualSearchInput').value.trim();
     const estiloSelecionado = $('#genreFilter').value;
+    let termoFinal = textoDigitado && estiloSelecionado ? `${textoDigitado} ${estiloSelecionado}` : estiloSelecionado || textoDigitado;
 
-    let termoFinal = "";
-
-    if (textoDigitado && estiloSelecionado) {
-      termoFinal = `${textoDigitado} ${estiloSelecionado}`;
-    } else if (estiloSelecionado) {
-      termoFinal = estiloSelecionado;
-    } else if (textoDigitado) {
-      termoFinal = textoDigitado;
-    } else {
-      toast('Digite algo ou selecione um estilo!');
-      return;
-    }
-
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelector('[data-tab="hits"]').classList.add('active');
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    $('#hits').classList.add('active');
+    if (!termoFinal) { toast('Digite algo ou selecione um estilo!'); return; }
+    ultimoTermoBuscado = termoFinal;
 
     const list = $('#hitsList');
     $('#hitsTitle').textContent = `Resultados para: "${termoFinal}"`;
     list.innerHTML = '<div class="spinner"></div>';
 
+    mudarAbaPara('hits');
+
     try {
       const data = await seguroFetch(`/api/spotify?q=${encodeURIComponent(termoFinal)}`);
-      if (!Array.isArray(data)) throw new Error('Formato inválido');
-      
-      currentHits = data.map(mapearTrackSpotify);
-      currentHits.sort((a, b) => b.popularity - a.popularity);
-      
-      renderTrackList(list, currentHits);
-      toast(`Busca filtrada concluída!`);
+      currentList = data.map(mapearTrackSpotify).sort((a, b) => b.popularity - a.popularity);
+      renderTrackList(list, currentList);
+      toast(`Busca concluída no Spotify!`);
     } catch(e) {
-      console.error(e);
-      list.innerHTML = `<p style="color:red;text-align:center;">Erro na busca manual: ${e.message || e}</p>`;
+      list.innerHTML = `<p style="color:red;text-align:center;">Erro na busca: ${e.message}</p>`;
     }
   }
 
   async function loadHits() {
     const list = $('#hitsList');
-    $('#hitsTitle').textContent = 'Atualização Automática (Spotify Brasil)';
     list.innerHTML = '<div class="spinner"></div>';
     try {
-      const data = await seguroFetch('/api/spotify?q=Top%20Hits%20Brasil');
-      if (!Array.isArray(data)) throw new Error('Formato inválido');
-      
-      currentHits = data.map(mapearTrackSpotify);
-      renderTrackList(list, currentHits);
+      const data = await seguroFetch('/api/spotify?q=' + encodeURIComponent(ultimoTermoBuscado));
+      currentList = data.map(mapearTrackSpotify);
+      renderTrackList(list, currentList);
     } catch(e) {
-      console.error(e);
-      list.innerHTML = `<p style="color:red;text-align:center;">Erro real nos hits: ${e.message || e}</p>`;
+      list.innerHTML = `<p style="color:red;text-align:center;">Erro no Spotify: ${e.message}</p>`;
     }
   }
 
@@ -221,27 +233,27 @@
     list.innerHTML = '<div class="spinner"></div>';
     try {
       const data = await seguroFetch('/api/spotify?q=Viral%20Brasil');
-      if (!Array.isArray(data)) throw new Error('Formato inválido');
-      
-      currentOpps = data.map(mapearTrackSpotify);
-      currentOpps.sort((a, b) => b.popularity - a.popularity);
-      
-      renderTrackList(list, currentOpps);
+      const opps = data.map(mapearTrackSpotify).sort((a, b) => b.popularity - a.popularity);
+      renderTrackList(list, opps, true);
     } catch(e) {
-      console.error(e);
-      list.innerHTML = `<p style="color:red;text-align:center;">Erro real nas oportunidades: ${e.message || e}</p>`;
+      list.innerHTML = `<p style="color:red;text-align:center;">Erro nas tendências: ${e.message}</p>`;
     }
   }
 
-  function renderTrackList(container, tracks) {
-    if (!tracks.length) { container.innerHTML = '<p style="text-align:center;color:#888;">Nenhuma música encontrada.</p>'; return; }
-    container.innerHTML = tracks.map(t => {
-      const stars = '⭐'.repeat(t.nota) + '☆'.repeat(5 - t.nota);
-      const tituloEscapado = t.title.replace(/'/g, "\\'");
-      const artistaEscapado = t.artist.replace(/'/g, "\\'");
+  function mudarAbaPara(tabName) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    $('#' + tabName).classList.add('active');
+  }
 
+  function renderTrackList(container, tracks, esOportunidades = false) {
+    if (!tracks.length) { container.innerHTML = '<p style="text-align:center;color:#888;">Nenhuma música encontrada.</p>'; return; }
+    container.innerHTML = tracks.map((t, idx) => {
+      const stars = '⭐'.repeat(t.nota) + '☆'.repeat(5 - t.nota);
+      const isActiva = currentTrackIndex === idx && !esOportunidades;
       return `
-        <div class="music-card">
+        <div class="music-card ${isActiva ? 'playing' : ''}" id="card-${esOportunidades ? 'opp' : 'hits'}-${idx}">
           <img class="music-cover" src="${t.albumCover}" alt="">
           <div class="music-info">
             <div class="music-title">${t.title}</div>
@@ -249,117 +261,212 @@
             <div class="music-meta">
               <span class="badge">📊 Pop: ${t.popularity}%</span>
               <span class="badge">${t.uso}</span>
+              ${!t.preview ? '<span class="badge" style="color:#ffaa00;">⚠️ Sem Prévia</span>' : ''}
             </div>
             <div class="stars" style="margin-top:4px;">${stars}</div>
           </div>
           <div class="actions">
-            <button onclick="playPreview('${t.preview || ''}')" ${!t.preview?'disabled style="opacity:0.5;cursor:not-allowed;"':''}>▶ Prévia</button>
+            <button onclick="gerenciarPlayer(${idx}, ${esOportunidades})">▶ Ouvir</button>
             <button onclick="window.open('${t.spotifyUrl || '#'}','_blank')">🎵 Spotify</button>
-            <button onclick="verClipeNoYouTube('${tituloEscapado}', '${artistaEscapado}')">🎬 Clipe</button>
-            <button onclick="addToPlaylist('${t.id}')">➕ Playlist</button>
+            <button onclick="abrirYouTube('${t.title.replace(/'/g, "")}', '${t.artist.replace(/'/g, "")}')">🎬 Clipe</button>
+            <button onclick="abrirModalAdicionar('${t.id}', ${esOportunidades})">➕ Adicionar</button>
           </div>
         </div>`;
     }).join('');
   }
 
-  window.playPreview = function(url) {
-    if (!url) {
-      toast('Prévia indisponível para esta faixa no Spotify');
+  // LÓGICA DO MAESTRO DE ÁUDIO SEQUENCIAL
+  window.gerenciarPlayer = function(index, esOportunidades) {
+    if (esOportunidades) {
+      // Se clicou na aba de oportunidades, atualizamos a lista do player para ser ela
+      const list = $('#oppList');
+      // Copia temporariamente para a lista ativa do player
+      currentList = Array.from(document.querySelectorAll('#oppList .music-card')).map((_, i) => currentList[i]); 
+    }
+    
+    tocarFaixa(index);
+  };
+
+  function tocarFaixa(index) {
+    if (index < 0 || index >= currentList.length) {
+      ativarModoRadio();
       return;
     }
-    const audio = new Audio(url);
-    audio.play().catch(() => toast('Erro ao reproduzir prévia'));
+
+    currentTrackIndex = index;
+    const track = currentList[index];
+
+    // Atualiza classes visuais nas listas
+    document.querySelectorAll('.music-card').forEach(c => c.classList.remove('playing'));
+    const cardHits = $(`#card-hits-${index}`);
+    if (cardHits) cardHits.classList.add('playing');
+
+    // Se não houver link de áudio da prévia, pula automaticamente para a próxima
+    if (!track.preview) {
+      console.log(`Faixa "${track.title}" sem áudio. Pulando automaticamente...`);
+      tocarFaixa(index + 1);
+      return;
+    }
+
+    // Atualiza Barra de Controle Fixa no Rodapé
+    $('#playerCover').src = track.albumCover;
+    $('#playerTitle').textContent = track.title;
+    $('#playerArtist').textContent = track.artist;
+    $('#playerPlayPauseBtn').textContent = "⏸";
+
+    audioContext.src = track.preview;
+    audioContext.play()
+      .then(() => toast(`Tocando: ${track.title}`))
+      .catch(() => {
+        toast("Erro no áudio, pulando...");
+        tocarFaixa(index + 1);
+      });
+  }
+
+  // MODOS DE REPRODUÇÃO INFINITA AUTOMÁTICA
+  audioContext.onended = function() {
+    tocarFaixa(currentTrackIndex + 1);
   };
 
-  window.verClipeNoYouTube = async function(titulo, artista) {
-    toast('Buscando clipe no YouTube...');
+  async function ativarModoRadio() {
+    toast("Fim da lista atingido! Buscando mais músicas parecidas...");
     try {
-      const termoBusca = `${artista} - ${titulo}`;
-      const resposta = await fetch(`/api/youtube?q=${encodeURIComponent(termoBusca)}`);
-      if (!resposta.ok) throw new Error('Erro ao buscar vídeo');
-      
-      const dados = await resposta.json();
-      if (dados.videoUrl) {
-        window.open(dados.videoUrl, '_blank');
-      } else {
-        toast('Clipe não encontrado.');
+      // Modo Rádio por Afinidade inteligente: repete a busca usando o gênero do filtro ou o último termo
+      const data = await seguroFetch(`/api/spotify?q=${encodeURIComponent(ultimoTermoBuscado)}`);
+      if (data && data.length) {
+        currentList = data.map(mapearTrackSpotify).sort(() => Math.random() - 0.5); // Embaralha para parecer rádio
+        renderTrackList($('#hitsList'), currentList);
+        tocarFaixa(0);
       }
-    } catch (erro) {
-      console.error(erro);
-      toast('Erro ao conectar com o YouTube.');
+    } catch(e) {
+      toast("Não foi possível carregar o modo rádio.");
     }
+  }
+
+  // Controles do player fixo
+  $('#playerPlayPauseBtn').addEventListener('click', () => {
+    if (audioContext.paused) {
+      audioContext.play();
+      $('#playerPlayPauseBtn').textContent = "⏸";
+    } else {
+      audioContext.pause();
+      $('#playerPlayPauseBtn').textContent = "▶";
+    }
+  });
+
+  $('#playerNextBtn').addEventListener('click', () => {
+    tocarFaixa(currentTrackIndex + 1);
+  });
+
+  window.abrirYouTube = function(titulo, artista) {
+    window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(artista + ' ' + titulo + ' clipe oficial')}`, '_blank');
   };
 
-  window.addToPlaylist = function(trackId) {
-    const playlistName = $('#playlistTemplate').value;
-    if (!playlistName) { toast('Selecione uma playlist'); return; }
-    const track = [...currentHits, ...currentOpps].find(t => t.id == trackId);
-    if (!track) return;
-    let playlist = playlists.find(p => p.name === playlistName);
-    if (!playlist) {
-      playlist = { name: playlistName, tracks: [] };
-      playlists.push(playlist);
-    }
-    if (playlist.tracks.some(t => t.id == trackId)) { toast('Música já está na playlist'); return; }
-    playlist.tracks.push(track);
+  // BANCO DE DADOS E GERENCIAMENTO AVANÇADO DE PLAYLISTS (SETS)
+  $('#createPlaylistBtn').addEventListener('click', () => {
+    const nome = $('#newPlaylistName').value.trim();
+    if (!nome) { toast('Digite o nome do set!'); return; }
+    if (playlists.some(p => p.name.toLowerCase() === nome.toLowerCase())) { toast('Este set já existe!'); return; }
+    
+    playlists.push({ name: nome, tracks: [] });
     localStorage.setItem('djradar_playlists', JSON.stringify(playlists));
-    toast(`Adicionada a "${playlistName}"`);
+    $('#newPlaylistName').value = '';
     renderPlaylists();
+    toast(`Set "${nome}" criado!`);
+  });
+
+  window.abrirModalAdicionar = function(trackId, esOportunidades) {
+    if (!playlists.length) { toast('Crie um Set primeiro na aba de Playlists!'); return; }
+    
+    // Procura qual o nome da playlist que o usuário deseja adicionar
+    let opcoes = playlists.map((p, i) => `${i + 1} - ${p.name}`).join('\n');
+    let escolha = prompt(`Digite o NÚMERO do Set para adicionar esta música:\n\n${opcoes}`);
+    
+    if (!escolha) return;
+    let idx = parseInt(escolha) - 1;
+    
+    if (playlists[idx]) {
+      const track = currentList.find(t => t.id === trackId);
+      if (!track) return;
+      
+      if (playlists[idx].tracks.some(t => t.id === trackId)) { toast('Música já está nesse Set'); return; }
+      
+      playlists[idx].tracks.push(track);
+      localStorage.setItem('djradar_playlists', JSON.stringify(playlists));
+      toast(`Adicionada ao Set: ${playlists[idx].name}`);
+    } else {
+      toast('Opção inválida.');
+    }
   };
 
   function renderPlaylists() {
     const container = $('#playlistsList');
-    if (!playlists.length) { container.innerHTML = '<p style="text-align:center;color:#888;">Nenhuma playlist criada.</p>'; return; }
+    if (!playlists.length) { container.innerHTML = '<p style="text-align:center;color:#888;padding:20px;">Nenhum set salvo no celular.</p>'; return; }
+    
     container.innerHTML = playlists.map((pl, i) => `
-      <div style="margin-bottom:16px; background:var(--surface); padding:12px; border-radius:12px;">
-        <div class="playlist-item">
-          <strong>${pl.name}</strong> (${pl.tracks.length} músicas)
-          <button onclick="deletePlaylist(${i})" class="btn-secondary" style="padding:4px 10px; background:none; border:none; color:red; cursor:pointer;">🗑️</button>
+      <div class="playlist-box">
+        <div class="playlist-header">
+          <strong>📂 ${pl.name}</strong>
+          <span style="font-size:0.8rem;color:var(--text2);">${pl.tracks.length} tracks</span>
+          <button onclick="deletarPlaylist(${i})" style="background:none;border:none;color:#ff3333;cursor:pointer;">🗑️ Excluir</button>
         </div>
-        <div style="margin-top:8px;">
-          <button onclick="exportPlaylist(${i}, 'txt')" class="btn-primary" style="font-size:0.8rem; padding:4px 8px; background:var(--accent); border:none; color:white; border-radius:10px; cursor:pointer;">📋 Copiar TXT</button>
+        <div style="max-height:150px; overflow-y:auto; margin-bottom:10px;">
+          ${pl.tracks.map((t, idx) => `
+            <div class="playlist-track">
+              <span>${idx+1}. ${t.artist} - ${t.title}</span>
+              <button onclick="removerFaixa(${i}, ${idx})" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:0.7rem;">❌</button>
+            </div>
+          `).join('') || '<p style="font-size:0.8rem;color:#666;">Set vazio.</p>'}
         </div>
+        <button onclick="copiarTxtSet(${i})" style="width:100%; padding:8px; background:var(--surface2); border:1px solid var(--accent); color:white; border-radius:8px; font-size:0.8rem; cursor:pointer; font-weight:600;">📋 Copiar Set (Formato Texto Limpo)</button>
       </div>
     `).join('');
   }
 
-  window.deletePlaylist = function(idx) {
-    playlists.splice(idx, 1);
+  window.deletarPlaylist = function(idx) {
+    if(confirm(`Tem certeza que quer apagar o set "${playlists[idx].name}"?`)) {
+      playlists.splice(idx, 1);
+      localStorage.setItem('djradar_playlists', JSON.stringify(playlists));
+      renderPlaylists();
+    }
+  };
+
+  window.removerFaixa = function(pIdx, tIdx) {
+    playlists[pIdx].tracks.splice(tIdx, 1);
     localStorage.setItem('djradar_playlists', JSON.stringify(playlists));
     renderPlaylists();
+    toast('Faixa removida do set.');
   };
 
-  window.exportPlaylist = function(idx, type) {
+  window.copiarTxtSet = function(idx) {
     const pl = playlists[idx];
-    if (!pl || !pl.tracks.length) return toast('Playlist vazia');
-    let content = pl.tracks.map((t,i) => `${i+1}. ${t.artist} - ${t.title}`).join('\n');
-    navigator.clipboard.writeText(content);
-    toast('Lista copiada para a área de transferência!');
+    if (!pl.tracks.length) { toast('Este set está vazio!'); return; }
+    
+    let textoLimpo = pl.tracks.map((t, i) => `${i + 1}. ${t.artist} - ${t.title}`).join('\n');
+    
+    navigator.clipboard.writeText(textoLimpo)
+      .then(() => toast('Lista copiada! Cole no bloco de notas ou software de DJ.'))
+      .catch(() => toast('Erro ao copiar texto.'));
   };
 
+  // Gerenciamento de Abas
   document.querySelectorAll('.tab').forEach(tab => {
-    tab.addEventListener('click', ()=> {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-      $('#' + tab.dataset.tab).classList.add('active');
-      if (tab.dataset.tab === 'hits' && !currentHits.length) loadHits();
-      if (tab.dataset.tab === 'oportunidades' && !currentOpps.length) loadOportunidades();
+    tab.addEventListener('click', () => {
+      mudarAbaPara(tab.dataset.tab);
+      if (tab.dataset.tab === 'hits' && !currentList.length) loadHits();
+      if (tab.dataset.tab === 'oportunidades') loadOportunidades();
       if (tab.dataset.tab === 'playlists') renderPlaylists();
     });
   });
 
   $('#manualSearchBtn').addEventListener('click', executarBuscaManual);
-  $('#manualSearchInput').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') executarBuscaManual();
-  });
-  
+  $('#manualSearchInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') executarBuscaManual(); });
   $('#genreFilter').addEventListener('change', executarBuscaManual);
   $('#refreshHits').addEventListener('click', () => loadHits());
   $('#refreshOpp').addEventListener('click', () => loadOportunidades());
 
+  // Início automático
   loadHits();
-  renderPlaylists();
 })();
 </script>
 </body>
