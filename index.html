@@ -22,7 +22,6 @@
     header { display: flex; justify-content: space-between; align-items: center; }
     h1 { font-size: 1.8rem; font-weight: 700; background: linear-gradient(135deg, var(--accent), #ffaa00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     
-    /* Barra de Pesquisa Otimizada com Dropdown */
     .search-container { display: flex; flex-direction: column; gap: 8px; background: var(--surface); padding: 12px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
     .search-box { display: flex; gap: 8px; flex-wrap: wrap; }
     .search-box input { flex: 2; min-width: 180px; padding: 12px; border-radius: 12px; border: none; background: var(--surface2); color: var(--text); font-size: 1rem; font-weight: 500; }
@@ -65,7 +64,6 @@
     <h1>📡 DJ Radar</h1>
   </header>
 
-  <!-- Super Barra de Pesquisa Manual com Filtro de Estilos -->
   <div class="search-container">
     <div class="search-box">
       <input type="text" id="manualSearchInput" placeholder="🔍 Digite música, artista ou use o filtro...">
@@ -161,14 +159,12 @@
     };
   }
 
-  // Função Avançada do Super Buscador Combinado
   async function executarBuscaManual() {
     const textoDigitado = $('#manualSearchInput').value.trim();
     const estiloSelecionado = $('#genreFilter').value;
 
     let termoFinal = "";
 
-    // Lógica para busca perfeita combinando texto + estilo de precisão
     if (textoDigitado && estiloSelecionado) {
       termoFinal = `${textoDigitado} ${estiloSelecionado}`;
     } else if (estiloSelecionado) {
@@ -200,7 +196,7 @@
       toast(`Busca filtrada concluída!`);
     } catch(e) {
       console.error(e);
-      list.innerHTML = '<p style="color:red;text-align:center;">Erro ao realizar busca no Spotify.</p>';
+      list.innerHTML = `<p style="color:red;text-align:center;">Erro na busca manual: ${e.message || e}</p>`;
     }
   }
 
@@ -216,7 +212,7 @@
       renderTrackList(list, currentHits);
     } catch(e) {
       console.error(e);
-      list.innerHTML = '<p style="color:red;text-align:center;">Erro ao carregar os hits do Spotify.</p>';
+      list.innerHTML = `<p style="color:red;text-align:center;">Erro real nos hits: ${e.message || e}</p>`;
     }
   }
 
@@ -233,7 +229,7 @@
       renderTrackList(list, currentOpps);
     } catch(e) {
       console.error(e);
-      list.innerHTML = '<p style="color:red;text-align:center;">Erro ao carregar as tendências do Spotify.</p>';
+      list.innerHTML = `<p style="color:red;text-align:center;">Erro real nas oportunidades: ${e.message || e}</p>`;
     }
   }
 
@@ -241,7 +237,6 @@
     if (!tracks.length) { container.innerHTML = '<p style="text-align:center;color:#888;">Nenhuma música encontrada.</p>'; return; }
     container.innerHTML = tracks.map(t => {
       const stars = '⭐'.repeat(t.nota) + '☆'.repeat(5 - t.nota);
-      
       const tituloEscapado = t.title.replace(/'/g, "\\'");
       const artistaEscapado = t.artist.replace(/'/g, "\\'");
 
@@ -284,7 +279,6 @@
       if (!resposta.ok) throw new Error('Erro ao buscar vídeo');
       
       const dados = await resposta.json();
-      
       if (dados.videoUrl) {
         window.open(dados.videoUrl, '_blank');
       } else {
@@ -339,7 +333,6 @@
     const pl = playlists[idx];
     if (!pl || !pl.tracks.length) return toast('Playlist vazia');
     let content = pl.tracks.map((t,i) => `${i+1}. ${t.artist} - ${t.title}`).join('\n');
-    
     navigator.clipboard.writeText(content);
     toast('Lista copiada para a área de transferência!');
   };
@@ -356,15 +349,12 @@
     });
   });
 
-  // Eventos do Buscador Combinado
   $('#manualSearchBtn').addEventListener('click', executarBuscaManual);
   $('#manualSearchInput').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') executarBuscaManual();
   });
   
-  // Dispara a busca automaticamente ao selecionar o estilo para agilizar
   $('#genreFilter').addEventListener('change', executarBuscaManual);
-
   $('#refreshHits').addEventListener('click', () => loadHits());
   $('#refreshOpp').addEventListener('click', () => loadOportunidades());
 
