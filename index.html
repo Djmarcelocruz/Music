@@ -122,7 +122,6 @@
     const releaseDate = item.release_date || item.album?.release_date || '2026-01-01';
     const ageDays = Math.max(1, (Date.now() - new Date(releaseDate).getTime()) / 86400000);
     
-    // Ajuste inteligente baseado no rank nativo do Deezer
     const rawRank = item.rank || 500000;
     const popularity = Math.min(100, Math.max(10, Math.round((rawRank / 1000000) * 100)));
 
@@ -170,7 +169,6 @@
       if (!data?.data) throw new Error('Formato inválido');
       let tracks = data.data.map(mapearTrack);
       
-      // Ordenação inteligente consertada: maior rank e mais recente sobe
       tracks.sort((a, b) => (b.popularity / (b.ageDays * 0.1 + 1)) - (a.popularity / (a.ageDays * 0.1 + 1)));
       
       currentOpps = tracks;
@@ -184,6 +182,11 @@
     if (!tracks.length) { container.innerHTML = '<p style="text-align:center;color:#888;">Nenhuma música.</p>'; return; }
     container.innerHTML = tracks.map(t => {
       const stars = '⭐'.repeat(t.nota) + '☆'.repeat(5 - t.nota);
+      
+      // Escapa aspas simples para evitar quebras no onClick JavaScript
+      const tituloEscapado = t.title.replace(/'/g, "\\'");
+      const artistaEscapado = t.artist.replace(/'/g, "\\'");
+
       return `
         <div class="music-card">
           <img class="music-cover" src="${t.albumCover || 'https://i.imgur.com/3nFjQ4o.png'}" alt="">
@@ -200,6 +203,7 @@
           <div class="actions">
             <button onclick="playPreview('${t.preview}')" ${!t.preview?'disabled':''}>▶ Prévia</button>
             <button onclick="window.open('${t.deezerUrl}','_blank')">🎧 Deezer</button>
+            <button onclick="verClipeNoYouTube('${tituloEscapado}', '${artistaEscapado}')">🎬 Clipe</button>
             <button onclick="addToPlaylist('${t.id}')">➕ Playlist</button>
           </div>
         </div>`;
@@ -210,6 +214,26 @@
     if (!url) return;
     const audio = new Audio(url);
     audio.play().catch(() => toast('Prévia indisponível'));
+  };
+
+  window.verClipeNoYouTube = async function(titulo, artista) {
+    toast('Buscando clipe no YouTube...');
+    try {
+      const termoBusca = `${artista} - ${titulo}`;
+      const resposta = await fetch(`/api/youtube?q=${encodeURIComponent(termoBusca)}`);
+      if (!resposta.ok) throw new Error('Erro ao buscar vídeo');
+      
+      const dados = await resposta.json();
+      
+      if (dados.videoUrl) {
+        window.open(dados.videoUrl, '_blank');
+      } else {
+        toast('Clipe não encontrado.');
+      }
+    } catch (erro) {
+      console.error(erro);
+      toast('Erro ao conectar com o YouTube.');
+    }
   };
 
   window.addToPlaylist = function(trackId) {
