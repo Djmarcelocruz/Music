@@ -184,7 +184,6 @@
     }));
   }
 
-  // SOLUÇÃO: CONTEXTO DE BUSCA REAL BASEADO EM TERMOS QUENTES DO BRASIL
   const termosTendencia = ["Top Hits Brasil", "Funk 2026", "MTG", "Piseiro 2026"];
   let indiceTermoAtual = 0;
 
@@ -192,12 +191,11 @@
     const list = $('#oppList');
     list.innerHTML = '<div class="spinner"></div>';
     
-    // Pega o termo atual para buscar dados reais de sucesso
     const termoAtual = termosTendencia[indiceTermoAtual];
     $('#trendCriteriaTitle').textContent = `📈 Base: ${termoAtual} (Reais)`;
 
     try {
-      const resultados Reais = await buscarNoiTunes(termoAtual, 25);
+      const resultadosReais = await buscarNoiTunes(termoAtual, 25);
       
       const termosViraisRedes = ["funk", "mtg", "remix", "piseiro", "teto", "luan", "matue", "anitta", "luisa"];
 
@@ -205,7 +203,6 @@
         const stringBusca = `${track.title} ${track.artist}`.toLowerCase();
         const possuiFatorViral = termosViraisRedes.some(termo => stringBusca.includes(termo)) || index < 6;
         
-        // Adiciona o marcador compacto discutido nas faixas de maior engajamento
         const tituloFinal = possuiFatorViral ? `📱 ${track.title}` : track.title;
 
         return {
@@ -216,7 +213,6 @@
 
       renderTrackList(list, activeList, true);
       
-      // Rotaciona o termo para a próxima vez que o DJ atualizar
       indiceTermoAtual = (indiceTermoAtual + 1) % termosTendencia.length;
     } catch(e) {
       list.innerHTML = `<p style="color:red;text-align:center;font-size:0.85rem;padding:10px;">Erro ao carregar tendências reais.</p>`;
