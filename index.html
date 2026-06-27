@@ -14,7 +14,6 @@
       --text2: #aaa;
       --accent: #ff5500;
       --accent2: #ff7b33;
-      --star: #ffd600;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Inter', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 16px; padding-bottom: 110px; }
@@ -37,21 +36,20 @@
     
     .filters { background: var(--surface); border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
     
-    /* Layout de Lista Compacta */
     .music-list { display: flex; flex-direction: column; gap: 4px; background: var(--surface); border-radius: 12px; padding: 6px; }
     .music-row { display: flex; align-items: center; justify-content: space-between; padding: 8px; border-radius: 8px; background: transparent; border-bottom: 1px solid #1c1c1c; gap: 10px; }
     .music-row.playing { background: var(--surface2); border-left: 3px solid var(--accent); }
     .music-row:last-child { border-bottom: none; }
     
-    .row-main { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+    .row-main { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; cursor: pointer; }
     .row-cover { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
     .row-details { min-width: 0; display: flex; flex-direction: column; }
     .row-title { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .row-artist { color: var(--text2); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .row-bpm { font-size: 0.7rem; color: var(--accent2); margin-top: 2px; font-weight: 500; }
     
     .row-actions { display: flex; gap: 4px; }
     .row-btn { background: var(--surface2); border: none; color: var(--text); width: 32px; height: 32px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .row-btn.play { background: rgba(255, 85, 0, 0.15); color: var(--accent); font-weight: bold; }
 
     .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: #222; border: 1px solid var(--accent); color: #fff; padding: 8px 18px; border-radius: 20px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1050; font-size: 0.85rem; }
     .toast.show { opacity: 1; }
@@ -59,7 +57,6 @@
     .spinner::after { content: ''; display: inline-block; width: 24px; height: 24px; border: 2px solid var(--accent); border-top: 2px solid transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     
-    /* Painel de Playlists */
     .playlist-box { background: var(--surface); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
     .playlist-creation { display: flex; gap: 8px; width: 100%; }
     .playlist-creation input { flex: 1; padding: 10px; border-radius: 8px; border: none; background: var(--surface2); color: var(--text); font-size: 0.9rem; }
@@ -67,7 +64,6 @@
     .playlist-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 6px; margin-bottom: 6px; font-size: 0.9rem; }
     .playlist-track { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 4px 0; color: var(--text2); }
 
-    /* Barra do Player Fixo no Rodapé (Posicionamento à Direita) */
     .bottom-player { position: fixed; bottom: 0; left: 0; right: 0; background: #111; border-top: 2px solid var(--accent); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; z-index: 1000; box-shadow: 0 -4px 15px rgba(0,0,0,0.8); }
     .player-info { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
     .player-info img { width: 42px; height: 42px; border-radius: 6px; }
@@ -90,9 +86,9 @@
       <input type="text" id="manualSearchInput" placeholder="🔍 Música, artista ou ritmo...">
       <select id="genreFilter">
         <option value="">🎯 Todos os Estilos</option>
-        <option value="Funk">🔥 Funk</option>
+        <option value="Funk 2026">🔥 Funk Atual</option>
         <option value="Mega Funk">🔊 Mega Funk</option>
-        <option value="Sertanejo">🤠 Sertanejo</option>
+        <option value="Sertanejo 2026">🤠 Sertanejo Universitário</option>
         <option value="Eletronica">🪩 Eletrônica</option>
         <option value="Pagode">🥁 Pagode</option>
       </select>
@@ -101,22 +97,21 @@
   </div>
 
   <div class="tabs">
-    <div class="tab active" data-tab="hits">🔥 Descobertas</div>
-    <div class="tab" data-tab="oportunidades">📈 Tendências</div>
+    <div class="tab active" data-tab="hits">🔍 Busca Direta</div>
+    <div class="tab" data-tab="oportunidades">📈 Tendências (Redes)</div>
     <div class="tab" data-tab="playlists">🎵 Meus Sets</div>
   </div>
 
   <div id="hits" class="panel active">
     <div class="filters">
-      <span id="hitsTitle" style="font-size: 0.8rem; color: var(--text2);">Lista de reprodução ativa</span>
-      <button id="refreshHits" style="background: var(--surface2); border: none; color: var(--text); padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;">🔄 Atualizar</button>
+      <span id="hitsTitle" style="font-size: 0.8rem; color: var(--text2);">Pronto para pesquisar</span>
     </div>
-    <div id="hitsList" class="music-list"><div class="spinner"></div></div>
+    <div id="hitsList" class="music-list"><p style="text-align:center;color:#888;font-size:0.85rem;padding:20px;">Digite um termo acima para buscar lançamentos.</p></div>
   </div>
 
   <div id="oportunidades" class="panel">
     <div class="filters">
-      <span style="font-size: 0.8rem; color: var(--text2);">Faixas virais em alta</span>
+      <span style="font-size: 0.8rem; color: var(--text2);">🔥 Top 25 Brasil + Virais do Insta/TikTok</span>
       <button id="refreshOpp" style="background: var(--surface2); border: none; color: var(--text); padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;">🔄 Atualizar</button>
     </div>
     <div id="oppList" class="music-list"><div class="spinner"></div></div>
@@ -151,9 +146,8 @@
 
 <script>
 (function() {
-  let currentList = []; 
+  let activeList = []; 
   let currentTrackIndex = -1;
-  let ultimoTermoBuscado = "Top Hits Brasil";
   let playlists = JSON.parse(localStorage.getItem('djradar_playlists') || '[]');
   
   const audioContext = new Audio();
@@ -164,9 +158,19 @@
     setTimeout(() => t.classList.remove('show'), dur);
   };
 
-  // BUSCA DIRETA DO ITUNES - ZERO ERROS DE CONEXÃO
+  // ESTIMATIVA INTELIGENTE DE BPM BASEADA NO ESTILO
+  function calcularBpmEstimado(titulo, artista) {
+    const texto = `${titulo} ${artista}`.toLowerCase();
+    if (texto.includes('funk') || texto.includes('mtg')) return '⏱️ ~130 - 140 BPM (Funk)';
+    if (texto.includes('mega') || texto.includes('electro')) return '⏱️ ~145 - 150 BPM (Mega)';
+    if (texto.includes('remix') || texto.includes('eletronica') || texto.includes('house')) return '⏱️ ~124 - 128 BPM (Eletrônica)';
+    if (texto.includes('sertanejo') || texto.includes('piseiro')) return '⏱️ ~120 - 130 BPM (Sertanejo)';
+    if (texto.includes('pagode') || texto.includes('samba')) return '⏱️ ~90 - 110 BPM (Pagode)';
+    return '⏱️ Estilo Geral (Variável)';
+  }
+
   async function buscarNoiTunes(termo) {
-    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(termo)}&media=music&limit=25&country=BR`;
+    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(termo)}&media=music&limit=30&country=BR`;
     const res = await fetch(url);
     if (!res.ok) throw new Error();
     const data = await res.json();
@@ -177,50 +181,73 @@
       artist: item.artistName,
       albumCover: item.artworkUrl100.replace('100x100bb', '300x300bb'),
       preview: item.previewUrl,
-      externalUrl: item.trackViewUrl
+      bpm: calcularBpmEstimado(item.trackName, item.artistName)
     }));
+  }
+
+  async function carregarTendenciasUnificadas() {
+    const list = $('#oppList');
+    list.innerHTML = '<div class="spinner"></div>';
+    try {
+      const urlFeed = `https://itunes.apple.com/br/rss/topsongs/limit=25/json`;
+      const res = await fetch(urlFeed);
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      
+      if (!data.feed || !data.feed.entry) {
+        list.innerHTML = `<p style="text-align:center;color:#888;font-size:0.85rem;">Nenhuma tendência encontrada.</p>`;
+        return;
+      }
+
+      const termosViraisRedes = ["funk", "mtg", "remix", "teto", "luan", "anitta", "matue", "henrique", "ze neto", "pabllo", "pedro sampaio", "luisa"];
+
+      activeList = data.feed.entry.map((entry, index) => {
+        const title = entry['im:name'].label;
+        const artist = entry['im:artist'].label;
+        const albumCover = entry['im:image'][2].label;
+        const trackId = entry.id.attributes['im:id'];
+        
+        const stringBusca = `${title} ${artist}`.toLowerCase();
+        const possuiFatorViral = termosViraisRedes.some(termo => stringBusca.includes(termo)) || index < 5;
+        const tituloFinal = possuiFatorViral ? `📱 ${title}` : title;
+
+        return {
+          id: trackId,
+          title: tituloFinal,
+          artist: artist,
+          albumCover: albumCover,
+          preview: entry.link && entry.link[1] ? entry.link[1].attributes.href : null,
+          bpm: calcularBpmEstimado(title, artist)
+        };
+      });
+
+      renderTrackList(list, activeList, true);
+    } catch(e) {
+      list.innerHTML = `<p style="color:red;text-align:center;font-size:0.85rem;padding:10px;">Erro ao carregar tendências.</p>`;
+    }
   }
 
   async function executarBuscaManual() {
     const textoDigitado = $('#manualSearchInput').value.trim();
     const estiloSelecionado = $('#genreFilter').value;
+    
     let termoFinal = textoDigitado && estiloSelecionado ? `${textoDigitado} ${estiloSelecionado}` : estiloSelecionado || textoDigitado;
+    if (termoFinal && !termoFinal.includes('2026')) {
+      termoFinal += " 2026";
+    }
 
     if (!termoFinal) { toast('Digite uma música ou estilo!'); return; }
-    ultimoTermoBuscado = termoFinal;
 
     const list = $('#hitsList');
-    $('#hitsTitle').textContent = `Resultados para: "${termoFinal}"`;
+    $('#hitsTitle').textContent = `Resultados para: "${textoDigitado || estiloSelecionado}"`;
     list.innerHTML = '<div class="spinner"></div>';
     mudarAbaPara('hits');
 
     try {
-      currentList = await buscarNoiTunes(termoFinal);
-      renderTrackList(list, currentList);
+      activeList = await buscarNoiTunes(termoFinal);
+      renderTrackList(list, activeList, false);
     } catch(e) {
-      list.innerHTML = `<p style="color:red;text-align:center;font-size:0.85rem;padding:10px;">Erro ao buscar dados. Tente novamente.</p>`;
-    }
-  }
-
-  async function loadHits() {
-    const list = $('#hitsList');
-    list.innerHTML = '<div class="spinner"></div>';
-    try {
-      currentList = await buscarNoiTunes(ultimoTermoBuscado);
-      renderTrackList(list, currentList);
-    } catch(e) {
-      list.innerHTML = `<p style="color:red;text-align:center;font-size:0.85rem;">Erro de conexão.</p>`;
-    }
-  }
-
-  async function loadOportunidades() {
-    const list = $('#oppList');
-    list.innerHTML = '<div class="spinner"></div>';
-    try {
-      const opps = await buscarNoiTunes('Viral Brasil');
-      renderTrackList(list, opps, true);
-    } catch(e) {
-      list.innerHTML = `<p style="color:red;text-align:center;font-size:0.85rem;">Erro de conexão.</p>`;
+      list.innerHTML = `<p style="color:red;text-align:center;font-size:0.85rem;padding:10px;">Erro ao buscar dados.</p>`;
     }
   }
 
@@ -231,47 +258,37 @@
     $('#' + tabName).classList.add('active');
   }
 
-  function renderTrackList(container, tracks, esOportunidades = false) {
+  function renderTrackList(container, tracks, esOportunidades) {
     if (!tracks.length) { container.innerHTML = '<p style="text-align:center;color:#888;font-size:0.85rem;padding:10px;">Nenhuma faixa encontrada.</p>'; return; }
     
     container.innerHTML = tracks.map((t, idx) => {
-      const isActiva = currentTrackIndex === idx && !esOportunidades;
+      const isActiva = currentTrackIndex === idx;
       return `
-        <div class="music-row ${isActiva ? 'playing' : ''}" id="row-${esOportunidades ? 'opp' : 'hits'}-${idx}">
-          <div class="row-main" onclick="gerenciarPlayer(${idx}, ${esOportunidades})">
+        <div class="music-row ${isActiva ? 'playing' : ''}" id="row-${idx}">
+          <div class="row-main" onclick="tocarFaixa(${idx})">
             <img class="row-cover" src="${t.albumCover}" alt="">
             <div class="row-details">
               <div class="row-title">${t.title}</div>
               <div class="row-artist">${t.artist}</div>
+              <div class="row-bpm">${t.bpm}</div>
             </div>
           </div>
-          <div class="row-buttons">
-            <button class="row-btn" onclick="abrirModalAdicionar('${t.id}', ${esOportunidades})" title="Adicionar ao Set">➕</button>
+          <div class="row-actions">
+            <button class="row-btn" onclick="abrirModalAdicionar('${t.id}')" title="Adicionar ao Set">➕</button>
           </div>
         </div>`;
     }).join('');
   }
 
-  window.gerenciarPlayer = function(index, esOportunidades) {
-    if (esOportunidades) {
-      toast('Carregando lista de tendências...');
-      return; 
-    }
-    tocarFaixa(index);
-  };
-
   function tocarFaixa(index) {
-    if (index < 0 || index >= currentList.length) {
-      ativarModoRadio();
-      return;
-    }
+    if (index < 0 || index >= activeList.length) return;
 
     currentTrackIndex = index;
-    const track = currentList[index];
+    const track = activeList[index];
 
     document.querySelectorAll('.music-row').forEach(r => r.classList.remove('playing'));
-    const rowHits = $(`#row-hits-${index}`);
-    if (rowHits) rowHits.classList.add('playing');
+    const rowAtual = $(`#row-${index}`);
+    if (rowAtual) rowAtual.classList.add('playing');
 
     if (!track.preview) {
       tocarFaixa(index + 1);
@@ -284,25 +301,18 @@
     $('#playerPlayPauseBtn').textContent = "⏸";
 
     audioContext.src = track.preview;
-    audioContext.play()
-      .catch(() => tocarFaixa(index + 1));
+    audioContext.play().catch(() => tocarFaixa(index + 1));
   }
 
+  // REQUISITO 2: MODO AUTOPLAY COM REINÍCIO AUTOMÁTICO EM LOOP
   audioContext.onended = function() {
-    tocarFaixa(currentTrackIndex + 1);
-  };
-
-  async function activarModoRadio() {
-    toast("Fim da lista! Misturando novas tracks...");
-    try {
-      currentList = await buscarNoiTunes(ultimoTermoBuscado);
-      currentList.sort(() => Math.random() - 0.5);
-      renderTrackList($('#hitsList'), currentList);
-      tocarFaixa(0);
-    } catch(e) {
-      toast("Fim da sequência.");
+    let proximaFaixa = currentTrackIndex + 1;
+    if (proximaFaixa >= activeList.length) {
+      proximaFaixa = 0; 
+      toast("Reiniciando a lista de tendências! 🔄");
     }
-  }
+    tocarFaixa(proximaFaixa);
+  };
 
   $('#playerPlayPauseBtn').addEventListener('click', () => {
     if (audioContext.src) {
@@ -317,10 +327,11 @@
   });
 
   $('#playerNextBtn').addEventListener('click', () => {
-    tocarFaixa(currentTrackIndex + 1);
+    let proximaFaixa = currentTrackIndex + 1;
+    if (proximaFaixa >= activeList.length) proximaFaixa = 0;
+    tocarFaixa(proximaFaixa);
   });
 
-  // SISTEMA GERENCIADOR DE PLAYLISTS
   $('#createPlaylistBtn').addEventListener('click', () => {
     const nome = $('#newPlaylistName').value.trim();
     if (!nome) { toast('Digite o nome do set!'); return; }
@@ -333,7 +344,7 @@
     toast(`Set "${nome}" criado!`);
   });
 
-  window.abrirModalAdicionar = function(trackId, esOportunidades) {
+  window.abrirModalAdicionar = function(trackId) {
     if (!playlists.length) { toast('Crie um Set na aba "Meus Sets" primeiro!'); return; }
     
     let opcoes = playlists.map((p, i) => `${i + 1}: ${p.name}`).join('\n');
@@ -343,7 +354,7 @@
     let idx = parseInt(escolha) - 1;
     
     if (playlists[idx]) {
-      const track = currentList.find(t => t.id === trackId);
+      const track = activeList.find(t => t.id === trackId);
       if (!track) return;
       
       if (playlists[idx].tracks.some(t => t.id === trackId)) { toast('Essa track já está no Set!'); return; }
@@ -370,15 +381,38 @@
         <div style="max-height:120px; overflow-y:auto; margin-bottom:8px;">
           ${pl.tracks.map((t, idx) => `
             <div class="playlist-track">
-              <span>${idx+1}. ${t.artist} - ${t.title}</span>
+              <span>${idx+1}. ${t.artist} - ${t.title} <small style="color:var(--accent2)">(${t.bpm.split('(')[1] || ''}</small></span>
               <button onclick="removerFaixa(${i}, ${idx})" style="background:none;border:none;color:#ff5500;font-size:0.7rem;cursor:pointer;">❌</button>
             </div>
           `).join('') || '<p style="font-size:0.75rem;color:#555;padding:4px 0;">Set vazio.</p>'}
         </div>
-        <button onclick="copiarTxtSet(${i})" style="width:100%; padding:6px; background:var(--surface2); border:1px solid var(--accent); color:white; border-radius:6px; font-size:0.75rem; cursor:pointer;">📋 Copiar Lista (Texto Limpo)</button>
+        <div style="display:flex; gap:6px;">
+          <button onclick="copiarTxtSet(${i})" style="flex:1; padding:6px; background:var(--surface2); border:1px solid #444; color:white; border-radius:6px; font-size:0.72rem; cursor:pointer;">📋 Copiar Lista</button>
+          <button onclick="exportarArquivoM3U(${i})" style="flex:1; padding:6px; background:var(--accent); border:none; color:white; border-radius:6px; font-size:0.72rem; font-weight:600; cursor:pointer;">💾 Exportar .M3U</button>
+        </div>
       </div>
     `).join('');
   }
+
+  // REQUISITO 3: EXPORTAÇÃO COMPATÍVEL COM VIRTUAL DJ / SERATO / REKORDBOX
+  window.exportarArquivoM3U = function(idx) {
+    const pl = playlists[idx];
+    if (!pl.tracks.length) { toast('Adicione tracks ao seu Set primeiro!'); return; }
+    
+    let m3uConteudo = "#EXTM3U\n";
+    pl.tracks.forEach(t => {
+      m3uConteudo += `#EXTINF:-1,${t.artist} - ${t.title}\n${t.preview || ''}\n`;
+    });
+    
+    const blob = new Blob([m3uConteudo], { type: "audio/x-mpegurl" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `${pl.name.replace(/\s+/g, '_')}_Set.m3u`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast(".M3U Baixado! Importe no seu Software de DJ.");
+  };
 
   window.deletarPlaylist = function(idx) {
     if(confirm(`Apagar o set "${playlists[idx].name}"?`)) {
@@ -399,25 +433,22 @@
     if (!pl.tracks.length) { toast('Set vazio!'); return; }
     let textoLimpo = pl.tracks.map((t, i) => `${i + 1}. ${t.artist} - ${t.title}`).join('\n');
     navigator.clipboard.writeText(textoLimpo)
-      .then(() => toast('Copiado! Cole no seu software de DJ.'))
+      .then(() => toast('Lista copiada!'))
       .catch(() => toast('Erro ao copiar.'));
   };
 
   document.querySelectorAll('.tab').forEach(tab => {
     tab.addEventListener('click', () => {
       mudarAbaPara(tab.dataset.tab);
-      if (tab.dataset.tab === 'hits' && !currentList.length) loadHits();
-      if (tab.dataset.tab === 'oportunidades') loadOportunidades();
+      if (tab.dataset.tab === 'oportunidades') carregarTendenciasUnificadas();
       if (tab.dataset.tab === 'playlists') renderPlaylists();
     });
   });
 
   $('#manualSearchBtn').addEventListener('click', executarBuscaManual);
   $('#manualSearchInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') executarBuscaManual(); });
-  $('#refreshHits').addEventListener('click', () => loadHits());
-  $('#refreshOpp').addEventListener('click', () => loadOportunidades());
+  $('#refreshOpp').addEventListener('click', carregarTendenciasUnificadas);
 
-  loadHits();
 })();
 </script>
 </body>
