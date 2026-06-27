@@ -111,8 +111,8 @@
 
   <div id="oportunidades" class="panel">
     <div class="filters">
-      <span style="font-size: 0.8rem; color: var(--text2);">🔥 Top 25 Brasil + Virais do Insta/TikTok</span>
-      <button id="refreshOpp" style="background: var(--surface2); border: none; color: var(--text); padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;">🔄 Atualizar</button>
+      <span id="trendCriteriaTitle" style="font-size: 0.8rem; color: var(--text2);">🔥 Carregando hits reais...</span>
+      <button id="refreshOpp" style="background: var(--surface2); border: none; color: var(--text); padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;">🔄 Alternar Trend</button>
     </div>
     <div id="oppList" class="music-list"><div class="spinner"></div></div>
   </div>
@@ -158,19 +158,18 @@
     setTimeout(() => t.classList.remove('show'), dur);
   };
 
-  // ESTIMATIVA INTELIGENTE DE BPM BASEADA NO ESTILO
   function calcularBpmEstimado(titulo, artista) {
     const texto = `${titulo} ${artista}`.toLowerCase();
     if (texto.includes('funk') || texto.includes('mtg')) return '⏱️ ~130 - 140 BPM (Funk)';
     if (texto.includes('mega') || texto.includes('electro')) return '⏱️ ~145 - 150 BPM (Mega)';
     if (texto.includes('remix') || texto.includes('eletronica') || texto.includes('house')) return '⏱️ ~124 - 128 BPM (Eletrônica)';
-    if (texto.includes('sertanejo') || texto.includes('piseiro')) return '⏱️ ~120 - 130 BPM (Sertanejo)';
+    if (texto.includes('sertanejo') || texto.includes('piseiro') || texto.includes('hits')) return '⏱️ ~120 - 130 BPM (Sertanejo/Pop)';
     if (texto.includes('pagode') || texto.includes('samba')) return '⏱️ ~90 - 110 BPM (Pagode)';
-    return '⏱️ Estilo Geral (Variável)';
+    return '⏱️ Ritmo de Pista (Variável)';
   }
 
-  async function buscarNoiTunes(termo) {
-    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(termo)}&media=music&limit=30&country=BR`;
+  async function buscarNoiTunes(termo, limite = 30) {
+    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(termo)}&media=music&limit=${limite}&country=BR`;
     const res = await fetch(url);
     if (!res.ok) throw new Error();
     const data = await res.json();
@@ -185,45 +184,42 @@
     }));
   }
 
+  // SOLUÇÃO: CONTEXTO DE BUSCA REAL BASEADO EM TERMOS QUENTES DO BRASIL
+  const termosTendencia = ["Top Hits Brasil", "Funk 2026", "MTG", "Piseiro 2026"];
+  let indiceTermoAtual = 0;
+
   async function carregarTendenciasUnificadas() {
     const list = $('#oppList');
     list.innerHTML = '<div class="spinner"></div>';
+    
+    // Pega o termo atual para buscar dados reais de sucesso
+    const termoAtual = termosTendencia[indiceTermoAtual];
+    $('#trendCriteriaTitle').textContent = `📈 Base: ${termoAtual} (Reais)`;
+
     try {
-      const urlFeed = `https://itunes.apple.com/br/rss/topsongs/limit=25/json`;
-      const res = await fetch(urlFeed);
-      if (!res.ok) throw new Error();
-      const data = await res.json();
+      const resultados Reais = await buscarNoiTunes(termoAtual, 25);
       
-      if (!data.feed || !data.feed.entry) {
-        list.innerHTML = `<p style="text-align:center;color:#888;font-size:0.85rem;">Nenhuma tendência encontrada.</p>`;
-        return;
-      }
+      const termosViraisRedes = ["funk", "mtg", "remix", "piseiro", "teto", "luan", "matue", "anitta", "luisa"];
 
-      const termosViraisRedes = ["funk", "mtg", "remix", "teto", "luan", "anitta", "matue", "henrique", "ze neto", "pabllo", "pedro sampaio", "luisa"];
-
-      activeList = data.feed.entry.map((entry, index) => {
-        const title = entry['im:name'].label;
-        const artist = entry['im:artist'].label;
-        const albumCover = entry['im:image'][2].label;
-        const trackId = entry.id.attributes['im:id'];
+      activeList = resultadosReais.map((track, index) => {
+        const stringBusca = `${track.title} ${track.artist}`.toLowerCase();
+        const possuiFatorViral = termosViraisRedes.some(termo => stringBusca.includes(termo)) || index < 6;
         
-        const stringBusca = `${title} ${artist}`.toLowerCase();
-        const possuiFatorViral = termosViraisRedes.some(termo => stringBusca.includes(termo)) || index < 5;
-        const tituloFinal = possuiFatorViral ? `📱 ${title}` : title;
+        // Adiciona o marcador compacto discutido nas faixas de maior engajamento
+        const tituloFinal = possuiFatorViral ? `📱 ${track.title}` : track.title;
 
         return {
-          id: trackId,
-          title: tituloFinal,
-          artist: artist,
-          albumCover: albumCover,
-          preview: entry.link && entry.link[1] ? entry.link[1].attributes.href : null,
-          bpm: calcularBpmEstimado(title, artist)
+          ...track,
+          title: tituloFinal
         };
       });
 
       renderTrackList(list, activeList, true);
+      
+      // Rotaciona o termo para a próxima vez que o DJ atualizar
+      indiceTermoAtual = (indiceTermoAtual + 1) % termosTendencia.length;
     } catch(e) {
-      list.innerHTML = `<p style="color:red;text-align:center;font-size:0.85rem;padding:10px;">Erro ao carregar tendências.</p>`;
+      list.innerHTML = `<p style="color:red;text-align:center;font-size:0.85rem;padding:10px;">Erro ao carregar tendências reais.</p>`;
     }
   }
 
@@ -304,12 +300,11 @@
     audioContext.play().catch(() => tocarFaixa(index + 1));
   }
 
-  // REQUISITO 2: MODO AUTOPLAY COM REINÍCIO AUTOMÁTICO EM LOOP
   audioContext.onended = function() {
     let proximaFaixa = currentTrackIndex + 1;
     if (proximaFaixa >= activeList.length) {
       proximaFaixa = 0; 
-      toast("Reiniciando a lista de tendências! 🔄");
+      toast("Loop: Voltando ao início da lista! 🔄");
     }
     tocarFaixa(proximaFaixa);
   };
@@ -381,7 +376,7 @@
         <div style="max-height:120px; overflow-y:auto; margin-bottom:8px;">
           ${pl.tracks.map((t, idx) => `
             <div class="playlist-track">
-              <span>${idx+1}. ${t.artist} - ${t.title} <small style="color:var(--accent2)">(${t.bpm.split('(')[1] || ''}</small></span>
+              <span>${idx+1}. ${t.artist} - ${t.title}</span>
               <button onclick="removerFaixa(${i}, ${idx})" style="background:none;border:none;color:#ff5500;font-size:0.7rem;cursor:pointer;">❌</button>
             </div>
           `).join('') || '<p style="font-size:0.75rem;color:#555;padding:4px 0;">Set vazio.</p>'}
@@ -394,7 +389,6 @@
     `).join('');
   }
 
-  // REQUISITO 3: EXPORTAÇÃO COMPATÍVEL COM VIRTUAL DJ / SERATO / REKORDBOX
   window.exportarArquivoM3U = function(idx) {
     const pl = playlists[idx];
     if (!pl.tracks.length) { toast('Adicione tracks ao seu Set primeiro!'); return; }
@@ -411,7 +405,7 @@
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    toast(".M3U Baixado! Importe no seu Software de DJ.");
+    toast(".M3U Baixado!");
   };
 
   window.deletarPlaylist = function(idx) {
