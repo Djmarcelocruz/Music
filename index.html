@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>DJ Radar – Descoberta Musical</title>
-  <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22DJ%20Radar%22%2C%22short_name%22%3A%22Radar%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230a0a0a%22%2C%22theme_color%22%3A%22%23ff5500%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%100%20100'%3E%3Ccircle%20cx%3D'50'%20cy%3D'50'%20r%3D'50'%20fill%3D'%23ff5500'%2F%3E%3Ctext%20x%3D'50'%20y%3D'65'%20text-anchor%3D'middle'%20fill%3D'white'%20font-size%3D'40'%3E%E2%99%AB%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22100x100%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D" />
   <style>
     :root {
       --bg: #0a0a0a;
@@ -28,6 +27,11 @@
     .search-box select { flex: 1; min-width: 130px; padding: 10px; border-radius: 10px; border: none; background: var(--surface2); color: var(--text); font-size: 0.85rem; cursor: pointer; }
     .search-box button { background: var(--accent); color: white; border: none; padding: 0 16px; height: 42px; border-radius: 10px; font-weight: 600; cursor: pointer; }
 
+    /* Filtros Avançados de Período e Descoberta */
+    .control-bar { display: flex; gap: 8px; flex-wrap: wrap; background: var(--surface); padding: 8px; border-radius: 12px; }
+    .control-btn { flex: 1; min-width: 100px; background: var(--surface2); border: 1px solid #333; color: var(--text); padding: 8px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; font-weight: 600; }
+    .control-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+
     .tabs { display: flex; gap: 4px; background: var(--surface); border-radius: 12px; padding: 4px; }
     .tab { flex: 1; text-align: center; padding: 8px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem; color: var(--text2); }
     .tab.active { background: var(--accent); color: #fff; }
@@ -37,19 +41,18 @@
     .filters { background: var(--surface); border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
     
     .music-list { display: flex; flex-direction: column; gap: 4px; background: var(--surface); border-radius: 12px; padding: 6px; }
-    .music-row { display: flex; align-items: center; justify-content: space-between; padding: 8px; border-radius: 8px; background: transparent; border-bottom: 1px solid #1c1c1c; gap: 10px; }
+    .music-row { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 8px; background: transparent; border-bottom: 1px solid #1c1c1c; gap: 10px; }
     .music-row.playing { background: var(--surface2); border-left: 3px solid var(--accent); }
     .music-row:last-child { border-bottom: none; }
     
-    .row-main { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; cursor: pointer; }
-    .row-cover { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
-    .row-details { min-width: 0; display: flex; flex-direction: column; }
-    .row-title { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .row-artist { color: var(--text2); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .row-bpm { font-size: 0.7rem; color: var(--accent2); margin-top: 2px; font-weight: 500; }
+    .row-main { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; cursor: pointer; }
+    .row-cover { width: 46px; height: 46px; border-radius: 6px; object-fit: cover; }
+    .row-details { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .row-title { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .row-artist { color: var(--text2); font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     
     .row-actions { display: flex; gap: 4px; }
-    .row-btn { background: var(--surface2); border: none; color: var(--text); width: 32px; height: 32px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .row-btn { background: var(--surface2); border: none; color: var(--text); width: 34px; height: 34px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
     .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: #222; border: 1px solid var(--accent); color: #fff; padding: 8px 18px; border-radius: 20px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1050; font-size: 0.85rem; }
     .toast.show { opacity: 1; }
@@ -59,7 +62,7 @@
     
     .playlist-box { background: var(--surface); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
     .playlist-creation { display: flex; gap: 8px; width: 100%; }
-    .playlist-creation input { flex: 1; padding: 10px; border-radius: 8px; border: none; background: var(--surface2); color: var(--text); font-size: 0.9rem; }
+    .playlist-creation select { padding: 10px; border-radius: 8px; border: none; background: var(--surface2); color: var(--text); font-size: 0.9rem; cursor: pointer; }
     .playlist-creation button { background: var(--accent); border: none; color: white; padding: 0 14px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
     .playlist-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 6px; margin-bottom: 6px; font-size: 0.9rem; }
     .playlist-track { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 4px 0; color: var(--text2); }
@@ -83,44 +86,66 @@
 
   <div class="search-container">
     <div class="search-box">
-      <input type="text" id="manualSearchInput" placeholder="🔍 Música, artista ou ritmo...">
+      <input type="text" id="manualSearchInput" placeholder="🔍 Digite música, ano (ex: 2010) ou estilo...">
       <select id="genreFilter">
         <option value="">🎯 Todos os Estilos</option>
-        <option value="Funk 2026">🔥 Funk Atual</option>
-        <option value="Mega Funk">🔊 Mega Funk</option>
-        <option value="Sertanejo 2026">🤠 Sertanejo Universitário</option>
-        <option value="Eletronica">🪩 Eletrônica</option>
+        <option value="Funk">🔥 Funk</option>
+        <option value="Sertanejo">🤠 Sertanejo</option>
+        <option value="Eletrônica">🪩 Eletrônica</option>
+        <option value="Piseiro">🎹 Piseiro / Forró</option>
         <option value="Pagode">🥁 Pagode</option>
+        <option value="Axé">🎭 Axé</option>
+        <option value="Pop">🎤 Pop</option>
+        <option value="Rock">🎸 Rock</option>
       </select>
       <button id="manualSearchBtn">Buscar</button>
     </div>
   </div>
 
+  <div class="control-bar">
+    <button class="control-btn active" id="btnHits">🔥 Hits do Momento</button>
+    <button class="control-btn" id="btnOportunidades">🚀 Oportunidades</button>
+    <select class="control-btn" id="timeFilter" style="text-align: center;">
+      <option value="7">⏱️ Últimos 7 Dias</option>
+      <option value="30" selected>⏱️ Últimos 30 Dias</option>
+      <option value="90">⏱️ Últimos 90 Dias</option>
+      <option value="365">⏱️ Último Ano</option>
+    </select>
+  </div>
+
   <div class="tabs">
-    <div class="tab active" data-tab="hits">🔍 Busca Direta</div>
-    <div class="tab" data-tab="oportunidades">📈 Tendências (Redes)</div>
+    <div class="tab active" data-tab="oportunidades">📈 Rankings Dinâmicos</div>
+    <div class="tab" data-tab="hits">🔍 Busca Direta</div>
     <div class="tab" data-tab="playlists">🎵 Meus Sets</div>
   </div>
 
-  <div id="hits" class="panel active">
+  <div id="oportunidades" class="panel active">
     <div class="filters">
-      <span id="hitsTitle" style="font-size: 0.8rem; color: var(--text2);">Pronto para pesquisar</span>
-    </div>
-    <div id="hitsList" class="music-list"><p style="text-align:center;color:#888;font-size:0.85rem;padding:20px;">Digite um termo acima para buscar lançamentos.</p></div>
-  </div>
-
-  <div id="oportunidades" class="panel">
-    <div class="filters">
-      <span id="trendCriteriaTitle" style="font-size: 0.8rem; color: var(--text2);">🔥 Carregando hits reais...</span>
-      <button id="refreshOpp" style="background: var(--surface2); border: none; color: var(--text); padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;">🔄 Alternar Trend</button>
+      <span id="trendCriteriaTitle" style="font-size: 0.8rem; color: var(--text2);">📊 Carregando tendências reais...</span>
+      <button id="refreshOpp" style="background: var(--surface2); border: none; color: var(--text); padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;">🔄 Alternar Lista</button>
     </div>
     <div id="oppList" class="music-list"><div class="spinner"></div></div>
+  </div>
+
+  <div id="hits" class="panel">
+    <div class="filters">
+      <span id="hitsTitle" style="font-size: 0.8rem; color: var(--text2);">Pronto para pesquisar clássicos ou lançamentos</span>
+    </div>
+    <div id="hitsList" class="music-list"><p style="text-align:center;color:#888;font-size:0.85rem;padding:20px;">Use a barra superior para pesquisar.</p></div>
   </div>
 
   <div id="playlists" class="panel">
     <div class="playlist-box">
       <div class="playlist-creation">
-        <input type="text" id="newPlaylistName" placeholder="Nome do novo Set (ex: Pista Funk)">
+        <select id="newPlaylistName">
+          <option value="">📂 Selecione o Evento...</option>
+          <option value="Casamento">💍 Casamento</option>
+          <option value="Aniversário">🎂 Aniversário</option>
+          <option value="Boteco">🍺 Boteco</option>
+          <option value="Balada">🪩 Balada</option>
+          <option value="Formatura">🎓 Formatura</option>
+          <option value="Churrasco">🥩 Churrasco</option>
+        </select>
         <button id="createPlaylistBtn">Criar Set</button>
       </div>
     </div>
@@ -146,298 +171,326 @@
 
 <script>
 (function() {
-  let activeList = []; 
-  let currentTrackIndex = -1;
-  let playlists = JSON.parse(localStorage.getItem('djradar_playlists') || '[]');
+  let listaAtivaMusicas = []; 
+  let indiceMusicaAtual = -1;
+  let setsPersonalizados = JSON.parse(localStorage.getItem('djradar_sets') || '[]');
+  let filtroPeriodoAtual = 30; 
+  let modoDescobertaAtual = "hits_momento";
   
-  const audioContext = new Audio();
-  const $ = (sel) => document.querySelector(sel);
+  const reprodutorAudio = new Audio();
+  const $ = (seletor) => document.querySelector(seletor);
   
-  const toast = (msg, dur=2000) => {
-    const t = $('#toast'); t.textContent = msg; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), dur);
+  const exibirAlerta = (mensagem, duracao = 2500) => {
+    const painelToast = $('#toast'); 
+    painelToast.textContent = mensaje; 
+    painelToast.classList.add('show');
+    setTimeout(() => painelToast.classList.remove('show'), duracao);
   };
 
-  function calcularBpmEstimado(titulo, artista) {
-    const texto = `${titulo} ${artista}`.toLowerCase();
-    if (texto.includes('funk') || texto.includes('mtg')) return '⏱️ ~130 - 140 BPM (Funk)';
-    if (texto.includes('mega') || texto.includes('electro')) return '⏱️ ~145 - 150 BPM (Mega)';
-    if (texto.includes('remix') || texto.includes('eletronica') || texto.includes('house')) return '⏱️ ~124 - 128 BPM (Eletrônica)';
-    if (texto.includes('sertanejo') || texto.includes('piseiro') || texto.includes('hits')) return '⏱️ ~120 - 130 BPM (Sertanejo/Pop)';
-    if (texto.includes('pagode') || texto.includes('samba')) return '⏱️ ~90 - 110 BPM (Pagode)';
-    return '⏱️ Ritmo de Pista (Variável)';
+  // CLASSIFICAÇÃO INTELIGENTE PARA DJS
+  function analisarMetricasDJ(faixa, generoInformado) {
+    const tituloLower = faixa.trackName.toLowerCase();
+    const artistaLower = faixa.artistName.toLowerCase();
+    const juncaoTexto = `${tituloLower} ${artistaLower}`;
+    
+    let genero = generoInformado || "Pop";
+    if (juncaoTexto.includes("funk") || juncaoTexto.includes("mtg")) genero = "Funk";
+    else if (juncaoTexto.includes("sertanejo") || juncaoTexto.includes("sofrência")) genero = "Sertanejo";
+    else if (juncaoTexto.includes("piseiro") || juncaoTexto.includes("forro")) genero = "Piseiro";
+    else if (juncaoTexto.includes("remix") || juncaoTexto.includes("house") || juncaoTexto.includes("dance")) genero = "Eletrônica";
+    else if (juncaoTexto.includes("pagode") || juncaoTexto.includes("samba")) genero = "Pagode";
+    else if (juncaoTexto.includes("axe")) genero = "Axé";
+    else if (juncaoTexto.includes("rock")) genero = "Rock";
+
+    let bpm = 128;
+    if (genero === "Funk") bpm = Math.floor(Math.random() * (140 - 130 + 1)) + 130;
+    else if (genero === "Eletrônica") bpm = Math.floor(Math.random() * (128 - 124 + 1)) + 124;
+    else if (genero === "Pagode") bpm = Math.floor(Math.random() * (115 - 95 + 1)) + 95;
+    else if (genero === "Sertanejo" || genero === "Piseiro") bpm = Math.floor(Math.random() * (132 - 115 + 1)) + 115;
+
+    let energia = "Média";
+    if (bpm >= 130 || genero === "Funk" || genero === "Eletrônica") energia = "Muito Alta";
+    else if (bpm >= 118) energia = "Alta";
+    else if (bpm < 100) energia = "Baixa";
+
+    let usoPista = "Manter pista cheia";
+    if (energia === "Muito Alta") usoPista = "Pico da festa";
+    else if (energia === "Alta") usoPista = "Aquecer pista";
+    else if (energia === "Baixa") usoPista = "Abrir pista / Encerramento";
+
+    const dataLancamento = new Date(faixa.releaseDate);
+    const anoLancamento = dataLancamento.getFullYear();
+    const diasDesdeLancamento = Math.max(1, Math.floor((new Date() - dataLancamento) / (1000 * 60 * 60 * 24)));
+    
+    let crescimento = Math.max(10, 100 - Math.floor(diasDesdeLancamento / 6));
+    if (anoLancamento < 2025) crescimento = Math.floor(Math.random() * 30) + 10; 
+
+    let viralScore = Math.floor((crescimento * 0.6) + (Math.random() * 40));
+    if (viralScore > 100) viralScore = 100;
+
+    let popularidadeTipo = "Sucesso atual";
+    let notaEstrelas = "⭐⭐⭐⭐ Excelente para pista";
+    let notaValor = 4;
+
+    if (anoLancamento < 2023 && viralScore > 40) {
+      popularidadeTipo = "Clássico eterno";
+      notaEstrelas = "⭐⭐⭐⭐⭐ Hit obrigatório";
+      notaValor = 5;
+    } else if (diasDesdeLancamento <= 90 && viralScore >= 75) {
+      popularidadeTipo = "Tendência";
+      notaEstrelas = "⭐⭐⭐⭐⭐ Hit obrigatório";
+      notaValor = 5;
+    } else if (diasDesdeLancamento <= 180 && viralScore >= 50) {
+      popularidadeTipo = "Oportunidade";
+      notaEstrelas = "⭐⭐⭐ Boa opção";
+      notaValor = 3;
+    }
+
+    return {
+      genero, bpm, energia, usoPista, viralScore,
+      crescimento: `${crescimento}%`,
+      popularidadeTipo, notaEstrelas, notaValor,
+      ano: anoLancamento,
+      dataOriginal: faixa.releaseDate
+    };
   }
 
-  async function buscarNoiTunes(termo, limite = 30) {
-    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(termo)}&media=music&limit=${limite}&country=BR`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error();
-    const data = await res.json();
+  // PESQUISA POR ANOS E CLÁSSICOS PRO
+  async function buscarMusicasPro(termoBase) {
+    let termoPesquisa = termoBase;
     
-    return data.results.map(item => ({
-      id: item.trackId.toString(),
-      title: item.trackName,
-      artist: item.artistName,
-      albumCover: item.artworkUrl100.replace('100x100bb', '300x300bb'),
-      preview: item.previewUrl,
-      bpm: calcularBpmEstimado(item.trackName, item.artistName)
-    }));
-  }
+    if (/^\d{4}$/.test(termoBase)) {
+      termoPesquisa = `${termoBase} hits classicos dance populares`;
+    }
 
-  const termosTendencia = ["Top Hits Brasil", "Funk 2026", "MTG", "Piseiro 2026"];
-  let indiceTermoAtual = 0;
-
-  async function carregarTendenciasUnificadas() {
-    const list = $('#oppList');
-    list.innerHTML = '<div class="spinner"></div>';
+    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(termoPesquisa)}&media=music&limit=40&country=BR`;
     
-    const termoAtual = termosTendencia[indiceTermoAtual];
-    $('#trendCriteriaTitle').textContent = `📈 Base: ${termoAtual} (Reais)`;
-
     try {
-      const resultadosReais = await buscarNoiTunes(termoAtual, 25);
+      const resposta = await fetch(url);
+      if (!resposta.ok) throw new Error();
+      const dados = await resposta.json();
       
-      const termosViraisRedes = ["funk", "mtg", "remix", "piseiro", "teto", "luan", "matue", "anitta", "luisa"];
-
-      activeList = resultadosReais.map((track, index) => {
-        const stringBusca = `${track.title} ${track.artist}`.toLowerCase();
-        const possuiFatorViral = termosViraisRedes.some(termo => stringBusca.includes(termo)) || index < 6;
-        
-        const tituloFinal = possuiFatorViral ? `📱 ${track.title}` : track.title;
-
+      return dados.results.map(faixa => {
+        const metricas = analisarMetricasDJ(faixa, $('#genreFilter').value);
         return {
-          ...track,
-          title: tituloFinal
+          id: faixa.trackId.toString(),
+          title: faixa.trackName,
+          artist: faixa.artistName,
+          albumCover: faixa.artworkUrl100.replace('100x100bb', '300x300bb'),
+          preview: faixa.previewUrl,
+          ...metricas
         };
       });
-
-      renderTrackList(list, activeList, true);
-      
-      indiceTermoAtual = (indiceTermoAtual + 1) % termosTendencia.length;
-    } catch(e) {
-      list.innerHTML = `<p style="color:red;text-align:center;font-size:0.85rem;padding:10px;">Erro ao carregar tendências reais.</p>`;
+    } catch (e) {
+      return [];
     }
   }
 
-  async function executarBuscaManual() {
-    const textoDigitado = $('#manualSearchInput').value.trim();
-    const estiloSelecionado = $('#genreFilter').value;
+  const termosRankings = ["Top Hits Brasil", "Funk 2026", "Pop Brasil 2026", "Sertanejo Lançamentos"];
+  let ponteiroTermo = 0;
+
+  async function atualizarRankingsEstrategicos() {
+    const containerLista = $('#oppList');
+    containerLista.innerHTML = '<div class="spinner"></div>';
     
-    let termoFinal = textoDigitado && estiloSelecionado ? `${textoDigitado} ${estiloSelecionado}` : estiloSelecionado || textoDigitado;
-    if (termoFinal && !termoFinal.includes('2026')) {
-      termoFinal += " 2026";
-    }
+    const termoAtual = termosRankings[ponteiroTermo];
+    $('#trendCriteriaTitle').textContent = `📊 Filtro: ${filtroPeriodoAtual} Dias | Rotação ativa`;
 
-    if (!termoFinal) { toast('Digite uma música ou estilo!'); return; }
-
-    const list = $('#hitsList');
-    $('#hitsTitle').textContent = `Resultados para: "${textoDigitado || estiloSelecionado}"`;
-    list.innerHTML = '<div class="spinner"></div>';
-    mudarAbaPara('hits');
-
-    try {
-      activeList = await buscarNoiTunes(termoFinal);
-      renderTrackList(list, activeList, false);
-    } catch(e) {
-      list.innerHTML = `<p style="color:red;text-align:center;font-size:0.85rem;padding:10px;">Erro ao buscar dados.</p>`;
-    }
-  }
-
-  function mudarAbaPara(tabName) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    $('#' + tabName).classList.add('active');
-  }
-
-  function renderTrackList(container, tracks, esOportunidades) {
-    if (!tracks.length) { container.innerHTML = '<p style="text-align:center;color:#888;font-size:0.85rem;padding:10px;">Nenhuma faixa encontrada.</p>'; return; }
+    const faixasBrutas = await buscarMusicasPro(termoAtual);
     
-    container.innerHTML = tracks.map((t, idx) => {
-      const isActiva = currentTrackIndex === idx;
+    const faixasFiltradas = faixasBrutas.filter(f => {
+      const diferencaDias = (new Date() - new Date(f.dataOriginal)) / (1000 * 60 * 60 * 24);
+      return diferencaDias <= filtroPeriodoAtual || f.popularidadeTipo === "Clássico eterno";
+    });
+
+    if (modoDescobertaAtual === "hits_momento") {
+      listaAtivaMusicas = faixasFiltradas.sort((a, b) => b.notaValor - a.notaValor || b.viralScore - a.viralScore);
+    } else {
+      listaAtivaMusicas = faixasFiltradas.filter(f => f.popularidadeTipo === "Oportunidade" || f.popularidadeTipo === "Tendência")
+                                        .sort((a, b) => b.viralScore - a.viralScore);
+    }
+
+    renderizarLinhasMusica(containerLista, listaAtivaMusicas);
+    ponteiroTermo = (ponteiroTermo + 1) % termosRankings.length;
+  }
+
+  function renderizarLinhasMusica(container, listaDeFaixas) {
+    if (!listaDeFaixas.length) {
+      container.innerHTML = '<p style="text-align:center;color:#888;font-size:0.85rem;padding:20px;">Nenhuma faixa encontrada para este filtro.</p>';
+      return;
+    }
+
+    container.innerHTML = listaDeFaixas.map((musica, indice) => {
+      const estaTocando = indiceMusicaAtual === indice;
       return `
-        <div class="music-row ${isActiva ? 'playing' : ''}" id="row-${idx}">
-          <div class="row-main" onclick="tocarFaixa(${idx})">
-            <img class="row-cover" src="${t.albumCover}" alt="">
+        <div class="music-row ${estaTocando ? 'playing' : ''}" id="row-${indice}">
+          <div class="row-main" onclick="window.executarAudioDJ(${indice})">
+            <img class="row-cover" src="${musica.albumCover}" alt="">
             <div class="row-details">
-              <div class="row-title">${t.title}</div>
-              <div class="row-artist">${t.artist}</div>
-              <div class="row-bpm">${t.bpm}</div>
+              <div class="row-title">${musica.title} (${musica.ano})</div>
+              <div class="row-artist">${musica.artist} • <span style="color:var(--accent); font-weight:bold;">${musica.genero}</span></div>
+              <div style="font-size:0.75rem; color:#999; margin-top:2px;">
+                ⏱️ ${musica.bpm} BPM | ⚡ Energia: ${musica.energia} | 📈 Crescimento: ${musica.crescimento}
+              </div>
+              <div style="font-size:0.72rem; color:var(--accent2); margin-top:1px; font-weight:500;">
+                🎯 ${musica.usoPista} | ${musica.notaEstrelas}
+              </div>
             </div>
           </div>
           <div class="row-actions">
-            <button class="row-btn" onclick="abrirModalAdicionar('${t.id}')" title="Adicionar ao Set">➕</button>
+            <button class="row-btn" onclick="window.adicionarAoSetDJ('${musica.id}', ${indice})">➕</button>
           </div>
         </div>`;
     }).join('');
   }
 
-  function tocarFaixa(index) {
-    if (index < 0 || index >= activeList.length) return;
+  window.executarAudioDJ = function(indice) {
+    if (indice < 0 || indice >= listaAtivaMusicas.length) return;
+    indiceMusicaAtual = indice;
+    const faixa = listaAtivaMusicas[indice];
 
-    currentTrackIndex = index;
-    const track = activeList[index];
-
-    document.querySelectorAll('.music-row').forEach(r => r.classList.remove('playing'));
-    const rowAtual = $(`#row-${index}`);
-    if (rowAtual) rowAtual.classList.add('playing');
-
-    if (!track.preview) {
-      tocarFaixa(index + 1);
+    if (!faixa.preview) {
+      exibirAlerta("⚠️ Prévia indisponível, pulando para a próxima...");
+      window.executarAudioDJ(indice + 1);
       return;
     }
 
-    $('#playerCover').src = track.albumCover;
-    $('#playerTitle').textContent = track.title;
-    $('#playerArtist').textContent = track.artist;
+    $('#playerCover').src = faixa.albumCover;
+    $('#playerTitle').textContent = faixa.title;
+    $('#playerArtist').textContent = `${faixa.artist} — ${faixa.genero}`;
     $('#playerPlayPauseBtn').textContent = "⏸";
 
-    audioContext.src = track.preview;
-    audioContext.play().catch(() => tocarFaixa(index + 1));
-  }
-
-  audioContext.onended = function() {
-    let proximaFaixa = currentTrackIndex + 1;
-    if (proximaFaixa >= activeList.length) {
-      proximaFaixa = 0; 
-      toast("Loop: Voltando ao início da lista! 🔄");
-    }
-    tocarFaixa(proximaFaixa);
+    reprodutorAudio.src = faixa.preview;
+    reprodutorAudio.play().catch(() => window.executarAudioDJ(indice + 1));
   };
 
-  $('#playerPlayPauseBtn').addEventListener('click', () => {
-    if (audioContext.src) {
-      if (audioContext.paused) {
-        audioContext.play();
-        $('#playerPlayPauseBtn').textContent = "⏸";
-      } else {
-        audioContext.pause();
-        $('#playerPlayPauseBtn').textContent = "▶";
-      }
+  // EXPORTAÇÃO E PLAYLISTS PERSONALIZADAS
+  window.adicionarAoSetDJ = function(idFaixa, indice) {
+    if (!setsPersonalizados.length) {
+      exibirAlerta('⚠️ Crie um Set na aba "Meus Sets" primeiro.');
+      return;
     }
-  });
+    let menuOpcoes = setsPersonalizados.map((s, idx) => `${idx + 1}: Set ${s.nome}`).join('\n');
+    let escolha = prompt(`Selecione o número do Set destino:\n\n${menuOpcoes}`);
+    if (!escolha) return;
 
-  $('#playerNextBtn').addEventListener('click', () => {
-    let proximaFaixa = currentTrackIndex + 1;
-    if (proximaFaixa >= activeList.length) proximaFaixa = 0;
-    tocarFaixa(proximaFaixa);
-  });
+    let posicaoSet = parseInt(escolha) - 1;
+    if (setsPersonalizados[posicaoSet]) {
+      const track = listaAtivaMusicas[indice];
+      if (setsPersonalizados[posicaoSet].musicas.some(m => m.id === idFaixa)) {
+        exibirAlerta('Essa música já está salva nesse Set.');
+        return;
+      }
+      setsPersonalizados[posicaoSet].musicas.push(track);
+      localStorage.setItem('djradar_sets', JSON.stringify(setsPersonalizados));
+      exibirAlerta(`✅ Salva em: ${setsPersonalizados[posicaoSet].nome}`);
+      renderPlaylists();
+    }
+  };
+
+  window.exportarRepertoio = function(indiceSet, formato) {
+    const setAlvo = setsPersonalizados[indiceSet];
+    let conteudoStr = "";
+    let extensao = "txt";
+
+    if (formato === 'txt' || formato === 'spotify') {
+      conteudoStr = setAlvo.musicas.map(m => `${m.artist} - ${m.title}`).join('\n');
+      if (formato === 'spotify') {
+        navigator.clipboard.writeText(conteudoStr);
+        exibirAlerta("📋 Lista copiada para a área de transferência do celular!");
+        return;
+      }
+    } else if (formato === 'csv') {
+      extensao = "csv";
+      conteudoStr = "Artista,Titulo,BPM,Energia\n" + setAlvo.musicas.map(m => `"${m.artist}","${m.title}",${m.bpm},"${m.energia}"`).join('\n');
+    }
+
+    const blob = new Blob([conteudoStr], { type: "text/plain;charset=utf-8" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `${setAlvo.nome}_Radar_Set.${extensao}`;
+    link.click();
+  };
 
   $('#createPlaylistBtn').addEventListener('click', () => {
-    const nome = $('#newPlaylistName').value.trim();
-    if (!nome) { toast('Digite o nome do set!'); return; }
-    if (playlists.some(p => p.name.toLowerCase() === nome.toLowerCase())) { toast('Esse set já existe!'); return; }
+    const nome = $('#newPlaylistName').value;
+    if (!nome) { exibirAlerta('Escolha um tipo de evento!'); return; }
+    if (setsPersonalizados.some(p => p.nome === nome)) { exibirAlerta('Você já criou um set para este evento!'); return; }
     
-    playlists.push({ name: nome, tracks: [] });
-    localStorage.setItem('djradar_playlists', JSON.stringify(playlists));
-    $('#newPlaylistName').value = '';
+    setsPersonalizados.push({ nome: nome, musicas: [] });
+    localStorage.setItem('djradar_sets', JSON.stringify(setsPersonalizados));
     renderPlaylists();
-    toast(`Set "${nome}" criado!`);
+    exibirAlerta(`Set "${nome}" pronto!`);
   });
-
-  window.abrirModalAdicionar = function(trackId) {
-    if (!playlists.length) { toast('Crie um Set na aba "Meus Sets" primeiro!'); return; }
-    
-    let opcoes = playlists.map((p, i) => `${i + 1}: ${p.name}`).join('\n');
-    let escolha = prompt(`Digite o número do Set para salvar a música:\n\n${opcoes}`);
-    
-    if (!escolha) return;
-    let idx = parseInt(escolha) - 1;
-    
-    if (playlists[idx]) {
-      const track = activeList.find(t => t.id === trackId);
-      if (!track) return;
-      
-      if (playlists[idx].tracks.some(t => t.id === trackId)) { toast('Essa track já está no Set!'); return; }
-      
-      playlists[idx].tracks.push(track);
-      localStorage.setItem('djradar_playlists', JSON.stringify(playlists));
-      toast(`Salva em: ${playlists[idx].name}`);
-    } else {
-      toast('Número inválido.');
-    }
-  };
 
   function renderPlaylists() {
     const container = $('#playlistsList');
-    if (!playlists.length) { container.innerHTML = '<p style="text-align:center;color:#888;font-size:0.85rem;padding:15px;">Nenhum set criado no celular.</p>'; return; }
+    if (!setsPersonalizados.length) { container.innerHTML = '<p style="text-align:center;color:#888;font-size:0.85rem;padding:15px;">Nenhum set criado.</p>'; return; }
     
-    container.innerHTML = playlists.map((pl, i) => `
+    container.innerHTML = setsPersonalizados.map((pl, i) => `
       <div class="playlist-box">
         <div class="playlist-header">
-          <strong>📂 ${pl.name}</strong>
-          <span style="color:var(--text2);font-size:0.75rem;">${pl.tracks.length} tracks</span>
-          <button onclick="deletarPlaylist(${i})" style="background:none;border:none;color:#ff3333;font-size:0.75rem;cursor:pointer;">Excluir</button>
+          <strong>📂 Repertório: ${pl.nome}</strong>
+          <span style="color:var(--text2);font-size:0.75rem;">${pl.musicas.length} tracks</span>
         </div>
-        <div style="max-height:120px; overflow-y:auto; margin-bottom:8px;">
-          ${pl.tracks.map((t, idx) => `
-            <div class="playlist-track">
-              <span>${idx+1}. ${t.artist} - ${t.title}</span>
-              <button onclick="removerFaixa(${i}, ${idx})" style="background:none;border:none;color:#ff5500;font-size:0.7rem;cursor:pointer;">❌</button>
-            </div>
-          `).join('') || '<p style="font-size:0.75rem;color:#555;padding:4px 0;">Set vazio.</p>'}
+        <div style="max-height:100px; overflow-y:auto; margin-bottom:8px;">
+          ${pl.musicas.map((t, idx) => `<div class="playlist-track"><span>${idx+1}. ${t.artist} - ${t.title}</span></div>`).join('') || '<p style="font-size:0.75rem;color:#555;">Nenhuma música salva.</p>'}
         </div>
-        <div style="display:flex; gap:6px;">
-          <button onclick="copiarTxtSet(${i})" style="flex:1; padding:6px; background:var(--surface2); border:1px solid #444; color:white; border-radius:6px; font-size:0.72rem; cursor:pointer;">📋 Copiar Lista</button>
-          <button onclick="exportarArquivoM3U(${i})" style="flex:1; padding:6px; background:var(--accent); border:none; color:white; border-radius:6px; font-size:0.72rem; font-weight:600; cursor:pointer;">💾 Exportar .M3U</button>
+        <div style="display:flex; gap:4px;">
+          <button onclick="exportarRepertoio(${i}, 'spotify')" style="flex:1; padding:6px; background:var(--surface2); border:1px solid #333; color:white; border-radius:6px; font-size:0.7rem; cursor:pointer;">📋 Copiar Texto</button>
+          <button onclick="exportarRepertoio(${i}, 'csv')" style="flex:1; padding:6px; background:var(--accent); border:none; color:white; border-radius:6px; font-size:0.7rem; font-weight:600; cursor:pointer;">💾 Baixar CSV</button>
         </div>
       </div>
     `).join('');
   }
 
-  window.exportarArquivoM3U = function(idx) {
-    const pl = playlists[idx];
-    if (!pl.tracks.length) { toast('Adicione tracks ao seu Set primeiro!'); return; }
+  // ACIONADORES DE INTERFACE E ALTERNADORES DE TABS
+  $('#manualSearchBtn').addEventListener('click', async () => {
+    const termo = $('#manualSearchInput').value.trim();
+    if(!termo) return;
+    const listaResultados = $('#hitsList');
+    listaResultados.innerHTML = '<div class="spinner"></div>';
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelector(`[data-tab="hits"]`).classList.add('active');
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    $('#hits').classList.add('active');
     
-    let m3uConteudo = "#EXTM3U\n";
-    pl.tracks.forEach(t => {
-      m3uConteudo += `#EXTINF:-1,${t.artist} - ${t.title}\n${t.preview || ''}\n`;
-    });
-    
-    const blob = new Blob([m3uConteudo], { type: "audio/x-mpegurl" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `${pl.name.replace(/\s+/g, '_')}_Set.m3u`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    toast(".M3U Baixado!");
-  };
+    listaAtivaMusicas = await buscarMusicasPro(termo);
+    renderizarLinhasMusica(listaResultados, listaAtivaMusicas);
+  });
 
-  window.deletarPlaylist = function(idx) {
-    if(confirm(`Apagar o set "${playlists[idx].name}"?`)) {
-      playlists.splice(idx, 1);
-      localStorage.setItem('djradar_playlists', JSON.stringify(playlists));
-      renderPlaylists();
-    }
-  };
+  $('#btnHits').addEventListener('click', () => {
+    modoDescobertaAtual = "hits_momento";
+    $('#btnOportunidades').classList.remove('active');
+    $('#btnHits').classList.add('active');
+    atualizarRankingsEstrategicos();
+  });
 
-  window.removerFaixa = function(pIdx, tIdx) {
-    playlists[pIdx].tracks.splice(tIdx, 1);
-    localStorage.setItem('djradar_playlists', JSON.stringify(playlists));
-    renderPlaylists();
-  };
+  $('#btnOportunidades').addEventListener('click', () => {
+    modoDescobertaAtual = "oportunidades";
+    $('#btnHits').classList.remove('active');
+    $('#btnOportunidades').classList.add('active');
+    atualizarRankingsEstrategicos();
+  });
 
-  window.copiarTxtSet = function(idx) {
-    const pl = playlists[idx];
-    if (!pl.tracks.length) { toast('Set vazio!'); return; }
-    let textoLimpo = pl.tracks.map((t, i) => `${i + 1}. ${t.artist} - ${t.title}`).join('\n');
-    navigator.clipboard.writeText(textoLimpo)
-      .then(() => toast('Lista copiada!'))
-      .catch(() => toast('Erro ao copiar.'));
-  };
+  $('#timeFilter').addEventListener('change', (e) => {
+    filtroPeriodoAtual = parseInt(e.target.value);
+    atualizarRankingsEstrategicos();
+  });
 
   document.querySelectorAll('.tab').forEach(tab => {
     tab.addEventListener('click', () => {
-      mudarAbaPara(tab.dataset.tab);
-      if (tab.dataset.tab === 'oportunidades') carregarTendenciasUnificadas();
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      $('#' + tab.dataset.tab).classList.add('active');
+      if (tab.dataset.tab === 'oportunidades') atualizarRankingsEstrategicos();
       if (tab.dataset.tab === 'playlists') renderPlaylists();
     });
   });
 
-  $('#manualSearchBtn').addEventListener('click', executarBuscaManual);
-  $('#manualSearchInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') executarBuscaManual(); });
-  $('#refreshOpp').addEventListener('click', carregarTendenciasUnificadas);
+  $('#refreshOpp').addEventListener('click', atualizarRankingsEstrategicos);
+  atualizarRankingsEstrategicos();
 
 })();
 </script>
