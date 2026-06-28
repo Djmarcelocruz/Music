@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>DJ Radar – Descoberta Musical</title>
+  <title>DJ Radar – Edição YouTube Pro</title>
   <style>
     :root {
       --bg: #0a0a0a;
@@ -13,6 +13,7 @@
       --text2: #aaa;
       --accent: #ff5500;
       --accent2: #ff7b33;
+      --youtube: #ff0000;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Inter', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 16px; padding-bottom: 110px; }
@@ -20,17 +21,22 @@
     header { display: flex; justify-content: space-between; align-items: center; }
     h1 { font-size: 1.6rem; font-weight: 700; background: linear-gradient(135deg, var(--accent), #ffaa00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     
+    /* Painel de Configuração da Chave */
+    .key-panel { background: #1a0d00; border: 1px solid var(--accent); padding: 12px; border-radius: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .key-panel label { font-size: 0.8rem; color: var(--accent2); font-weight: bold; }
+    .key-box { display: flex; gap: 8px; }
+    .key-box input { flex: 1; padding: 8px; border-radius: 6px; border: none; background: var(--surface2); color: #fff; font-size: 0.85rem; }
+    .key-box button { background: var(--accent); color: white; border: none; padding: 0 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
+
     .search-container { display: flex; flex-direction: column; gap: 8px; background: var(--surface); padding: 12px; border-radius: 14px; }
     .search-box { display: flex; gap: 8px; flex-wrap: wrap; }
     .search-box input { flex: 2; min-width: 180px; padding: 10px; border-radius: 10px; border: none; background: var(--surface2); color: var(--text); font-size: 0.95rem; }
-    .search-box input:focus, .search-box select:focus { outline: 2px solid var(--accent); }
-    .search-box select { flex: 1; min-width: 130px; padding: 10px; border-radius: 10px; border: none; background: var(--surface2); color: var(--text); font-size: 0.85rem; cursor: pointer; }
     .search-box button { background: var(--accent); color: white; border: none; padding: 0 16px; height: 42px; border-radius: 10px; font-weight: 600; cursor: pointer; }
+    .search-box select { flex: 1; min-width: 130px; padding: 10px; border-radius: 10px; border: none; background: var(--surface2); color: var(--text); font-size: 0.85rem; cursor: pointer; }
 
-    /* Filtros Avançados de Período e Descoberta */
     .control-bar { display: flex; gap: 8px; flex-wrap: wrap; background: var(--surface); padding: 8px; border-radius: 12px; }
-    .control-btn { flex: 1; min-width: 100px; background: var(--surface2); border: 1px solid #333; color: var(--text); padding: 8px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; font-weight: 600; }
-    .control-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+    .control-btn { flex: 1; min-width: 100px; background: var(--surface2); border: 1px solid #333; color: var(--text); padding: 8px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; font-weight: 600; text-align: center; }
+    .control-btn.active { background: var(--youtube); border-color: var(--youtube); color: white; }
 
     .tabs { display: flex; gap: 4px; background: var(--surface); border-radius: 12px; padding: 4px; }
     .tab { flex: 1; text-align: center; padding: 8px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem; color: var(--text2); }
@@ -39,12 +45,10 @@
     .panel.active { display: block; }
     
     .filters { background: var(--surface); border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    
     .music-list { display: flex; flex-direction: column; gap: 4px; background: var(--surface); border-radius: 12px; padding: 6px; }
-    .music-row { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 8px; background: transparent; border-bottom: 1px solid #1c1c1c; gap: 10px; }
-    .music-row.playing { background: var(--surface2); border-left: 3px solid var(--accent); }
-    .music-row:last-child { border-bottom: none; }
     
+    .music-row { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 8px; border-bottom: 1px solid #1c1c1c; gap: 10px; }
+    .music-row.playing { background: var(--surface2); border-left: 3px solid var(--accent); }
     .row-main { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; cursor: pointer; }
     .row-cover { width: 46px; height: 46px; border-radius: 6px; object-fit: cover; }
     .row-details { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
@@ -52,30 +56,30 @@
     .row-artist { color: var(--text2); font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     
     .row-actions { display: flex; gap: 4px; }
-    .row-btn { background: var(--surface2); border: none; color: var(--text); width: 34px; height: 34px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .row-btn { background: var(--surface2); border: none; color: var(--text); width: 34px; height: 34px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
     .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: #222; border: 1px solid var(--accent); color: #fff; padding: 8px 18px; border-radius: 20px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1050; font-size: 0.85rem; }
     .toast.show { opacity: 1; }
     .spinner { text-align: center; padding: 20px; }
     .spinner::after { content: ''; display: inline-block; width: 24px; height: 24px; border: 2px solid var(--accent); border-top: 2px solid transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    
+
     .playlist-box { background: var(--surface); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
     .playlist-creation { display: flex; gap: 8px; width: 100%; }
-    .playlist-creation select { padding: 10px; border-radius: 8px; border: none; background: var(--surface2); color: var(--text); font-size: 0.9rem; cursor: pointer; }
+    .playlist-creation select { padding: 10px; border-radius: 8px; border: none; background: var(--surface2); color: var(--text); font-size: 0.9rem; cursor: pointer; flex: 1; }
     .playlist-creation button { background: var(--accent); border: none; color: white; padding: 0 14px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
     .playlist-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 6px; margin-bottom: 6px; font-size: 0.9rem; }
     .playlist-track { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 4px 0; color: var(--text2); }
 
-    .bottom-player { position: fixed; bottom: 0; left: 0; right: 0; background: #111; border-top: 2px solid var(--accent); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; z-index: 1000; box-shadow: 0 -4px 15px rgba(0,0,0,0.8); }
+    .bottom-player { position: fixed; bottom: 0; left: 0; right: 0; background: #111; border-top: 2px solid var(--accent); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; z-index: 1000; }
     .player-info { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
     .player-info img { width: 42px; height: 42px; border-radius: 6px; }
     .player-text { min-width: 0; }
     .player-text .title { font-size: 0.85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .player-text .artist { font-size: 0.75rem; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .player-controls { display: flex; align-items: center; gap: 10px; margin-left: 12px; }
-    .player-btn { background: var(--accent); color: white; border: none; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.95rem; }
-    .player-btn.secondary { background: var(--surface2); color: var(--text); width: 34px; height: 34px; font-size: 0.85rem; }
+    .player-controls { display: flex; align-items: center; gap: 10px; }
+    .player-btn { background: var(--accent); color: white; border: none; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .player-btn.secondary { background: var(--surface2); color: var(--text); width: 34px; height: 34px; }
   </style>
 </head>
 <body>
@@ -84,12 +88,20 @@
     <h1>📡 DJ Radar</h1>
   </header>
 
+  <div class="key-panel">
+    <label for="youtubeKeyInput">🔑 CONEXÃO YOUTUBE CHARTS (API KEY)</label>
+    <div class="key-box">
+      <input type="password" id="youtubeKeyInput" placeholder="Cole sua chave v3 aqui...">
+      <button id="saveKeyBtn">Conectar</button>
+    </div>
+  </div>
+
   <div class="search-container">
     <div class="search-box">
-      <input type="text" id="manualSearchInput" placeholder="🔍 Digite música, ano (ex: 2010) ou estilo...">
+      <input type="text" id="manualSearchInput" placeholder="🔍 Buscar música, ano clássico ou ritmo...">
       <select id="genreFilter">
-        <option value="">🎯 Todos os Estilos</option>
-        <option value="Funk">🔥 Funk</option>
+        <option value="">🎯 Todos os Gêneros</option>
+        <option value="Funk"> Funk</option>
         <option value="Sertanejo">🤠 Sertanejo</option>
         <option value="Eletrônica">🪩 Eletrônica</option>
         <option value="Piseiro">🎹 Piseiro / Forró</option>
@@ -103,9 +115,9 @@
   </div>
 
   <div class="control-bar">
-    <button class="control-btn active" id="btnHits">🔥 Hits do Momento</button>
-    <button class="control-btn" id="btnOportunidades">🚀 Oportunidades</button>
-    <select class="control-btn" id="timeFilter" style="text-align: center;">
+    <button class="control-btn active" id="btnHits">🔥 Hits do Momento (YT)</button>
+    <button class="control-btn" id="btnOportunidades">🚀 Oportunidades Virais</button>
+    <select class="control-btn" id="timeFilter">
       <option value="7">⏱️ Últimos 7 Dias</option>
       <option value="30" selected>⏱️ Últimos 30 Dias</option>
       <option value="90">⏱️ Últimos 90 Dias</option>
@@ -114,24 +126,24 @@
   </div>
 
   <div class="tabs">
-    <div class="tab active" data-tab="oportunidades">📈 Rankings Dinâmicos</div>
-    <div class="tab" data-tab="hits">🔍 Busca Direta</div>
+    <div class="tab active" data-tab="oportunidades">📊 YouTube Live Charts</div>
+    <div class="tab" data-tab="hits">🔍 Pesquisa Geral</div>
     <div class="tab" data-tab="playlists">🎵 Meus Sets</div>
   </div>
 
   <div id="oportunidades" class="panel active">
     <div class="filters">
-      <span id="trendCriteriaTitle" style="font-size: 0.8rem; color: var(--text2);">📊 Carregando tendências reais...</span>
-      <button id="refreshOpp" style="background: var(--surface2); border: none; color: var(--text); padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;">🔄 Alternar Lista</button>
+      <span id="trendCriteriaTitle" style="font-size: 0.8rem; color: var(--text2);">🔒 Insira a chave acima para ativar os dados do YouTube.</span>
+      <button id="refreshOpp" style="background: var(--surface2); border: none; color: var(--text); padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;">🔄 Atualizar</button>
     </div>
-    <div id="oppList" class="music-list"><div class="spinner"></div></div>
+    <div id="oppList" class="music-list"></div>
   </div>
 
   <div id="hits" class="panel">
     <div class="filters">
-      <span id="hitsTitle" style="font-size: 0.8rem; color: var(--text2);">Pronto para pesquisar clássicos ou lançamentos</span>
+      <span id="hitsTitle" style="font-size: 0.8rem; color: var(--text2);">Pronto para pesquisas profissionais</span>
     </div>
-    <div id="hitsList" class="music-list"><p style="text-align:center;color:#888;font-size:0.85rem;padding:20px;">Use a barra superior para pesquisar.</p></div>
+    <div id="hitsList" class="music-list"><p style="text-align:center;color:#888;font-size:0.85rem;padding:20px;">Use a barra superior.</p></div>
   </div>
 
   <div id="playlists" class="panel">
@@ -159,8 +171,8 @@
   <div class="player-info">
     <img id="playerCover" src="https://i.imgur.com/3nFjQ4o.png" alt="">
     <div class="player-text">
-      <div class="title" id="playerTitle">Nenhuma música tocando</div>
-      <div class="artist" id="playerArtist">Selecione uma faixa</div>
+      <div class="title" id="playerTitle">Nenhuma faixa tocando</div>
+      <div class="artist" id="playerArtist">Selecione uma música</div>
     </div>
   </div>
   <div class="player-controls">
@@ -169,330 +181,5 @@
   </div>
 </div>
 
-<script>
-(function() {
-  let listaAtivaMusicas = []; 
-  let indiceMusicaAtual = -1;
-  let setsPersonalizados = JSON.parse(localStorage.getItem('djradar_sets') || '[]');
-  let filtroPeriodoAtual = 30; 
-  let modoDescobertaAtual = "hits_momento";
-  
-  const reprodutorAudio = new Audio();
-  const $ = (seletor) => document.querySelector(seletor);
-  
-  const exibirAlerta = (mensagem, duracao = 2500) => {
-    const painelToast = $('#toast'); 
-    painelToast.textContent = mensaje; 
-    painelToast.classList.add('show');
-    setTimeout(() => painelToast.classList.remove('show'), duracao);
-  };
-
-  // CLASSIFICAÇÃO INTELIGENTE PARA DJS
-  function analisarMetricasDJ(faixa, generoInformado) {
-    const tituloLower = faixa.trackName.toLowerCase();
-    const artistaLower = faixa.artistName.toLowerCase();
-    const juncaoTexto = `${tituloLower} ${artistaLower}`;
-    
-    let genero = generoInformado || "Pop";
-    if (juncaoTexto.includes("funk") || juncaoTexto.includes("mtg")) genero = "Funk";
-    else if (juncaoTexto.includes("sertanejo") || juncaoTexto.includes("sofrência")) genero = "Sertanejo";
-    else if (juncaoTexto.includes("piseiro") || juncaoTexto.includes("forro")) genero = "Piseiro";
-    else if (juncaoTexto.includes("remix") || juncaoTexto.includes("house") || juncaoTexto.includes("dance")) genero = "Eletrônica";
-    else if (juncaoTexto.includes("pagode") || juncaoTexto.includes("samba")) genero = "Pagode";
-    else if (juncaoTexto.includes("axe")) genero = "Axé";
-    else if (juncaoTexto.includes("rock")) genero = "Rock";
-
-    let bpm = 128;
-    if (genero === "Funk") bpm = Math.floor(Math.random() * (140 - 130 + 1)) + 130;
-    else if (genero === "Eletrônica") bpm = Math.floor(Math.random() * (128 - 124 + 1)) + 124;
-    else if (genero === "Pagode") bpm = Math.floor(Math.random() * (115 - 95 + 1)) + 95;
-    else if (genero === "Sertanejo" || genero === "Piseiro") bpm = Math.floor(Math.random() * (132 - 115 + 1)) + 115;
-
-    let energia = "Média";
-    if (bpm >= 130 || genero === "Funk" || genero === "Eletrônica") energia = "Muito Alta";
-    else if (bpm >= 118) energia = "Alta";
-    else if (bpm < 100) energia = "Baixa";
-
-    let usoPista = "Manter pista cheia";
-    if (energia === "Muito Alta") usoPista = "Pico da festa";
-    else if (energia === "Alta") usoPista = "Aquecer pista";
-    else if (energia === "Baixa") usoPista = "Abrir pista / Encerramento";
-
-    const dataLancamento = new Date(faixa.releaseDate);
-    const anoLancamento = dataLancamento.getFullYear();
-    const diasDesdeLancamento = Math.max(1, Math.floor((new Date() - dataLancamento) / (1000 * 60 * 60 * 24)));
-    
-    let crescimento = Math.max(10, 100 - Math.floor(diasDesdeLancamento / 6));
-    if (anoLancamento < 2025) crescimento = Math.floor(Math.random() * 30) + 10; 
-
-    let viralScore = Math.floor((crescimento * 0.6) + (Math.random() * 40));
-    if (viralScore > 100) viralScore = 100;
-
-    let popularidadeTipo = "Sucesso atual";
-    let notaEstrelas = "⭐⭐⭐⭐ Excelente para pista";
-    let notaValor = 4;
-
-    if (anoLancamento < 2023 && viralScore > 40) {
-      popularidadeTipo = "Clássico eterno";
-      notaEstrelas = "⭐⭐⭐⭐⭐ Hit obrigatório";
-      notaValor = 5;
-    } else if (diasDesdeLancamento <= 90 && viralScore >= 75) {
-      popularidadeTipo = "Tendência";
-      notaEstrelas = "⭐⭐⭐⭐⭐ Hit obrigatório";
-      notaValor = 5;
-    } else if (diasDesdeLancamento <= 180 && viralScore >= 50) {
-      popularidadeTipo = "Oportunidade";
-      notaEstrelas = "⭐⭐⭐ Boa opção";
-      notaValor = 3;
-    }
-
-    return {
-      genero, bpm, energia, usoPista, viralScore,
-      crescimento: `${crescimento}%`,
-      popularidadeTipo, notaEstrelas, notaValor,
-      ano: anoLancamento,
-      dataOriginal: faixa.releaseDate
-    };
-  }
-
-  // PESQUISA POR ANOS E CLÁSSICOS PRO
-  async function buscarMusicasPro(termoBase) {
-    let termoPesquisa = termoBase;
-    
-    if (/^\d{4}$/.test(termoBase)) {
-      termoPesquisa = `${termoBase} hits classicos dance populares`;
-    }
-
-    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(termoPesquisa)}&media=music&limit=40&country=BR`;
-    
-    try {
-      const resposta = await fetch(url);
-      if (!resposta.ok) throw new Error();
-      const dados = await resposta.json();
-      
-      return dados.results.map(faixa => {
-        const metricas = analisarMetricasDJ(faixa, $('#genreFilter').value);
-        return {
-          id: faixa.trackId.toString(),
-          title: faixa.trackName,
-          artist: faixa.artistName,
-          albumCover: faixa.artworkUrl100.replace('100x100bb', '300x300bb'),
-          preview: faixa.previewUrl,
-          ...metricas
-        };
-      });
-    } catch (e) {
-      return [];
-    }
-  }
-
-  const termosRankings = ["Top Hits Brasil", "Funk 2026", "Pop Brasil 2026", "Sertanejo Lançamentos"];
-  let ponteiroTermo = 0;
-
-  async function atualizarRankingsEstrategicos() {
-    const containerLista = $('#oppList');
-    containerLista.innerHTML = '<div class="spinner"></div>';
-    
-    const termoAtual = termosRankings[ponteiroTermo];
-    $('#trendCriteriaTitle').textContent = `📊 Filtro: ${filtroPeriodoAtual} Dias | Rotação ativa`;
-
-    const faixasBrutas = await buscarMusicasPro(termoAtual);
-    
-    const faixasFiltradas = faixasBrutas.filter(f => {
-      const diferencaDias = (new Date() - new Date(f.dataOriginal)) / (1000 * 60 * 60 * 24);
-      return diferencaDias <= filtroPeriodoAtual || f.popularidadeTipo === "Clássico eterno";
-    });
-
-    if (modoDescobertaAtual === "hits_momento") {
-      listaAtivaMusicas = faixasFiltradas.sort((a, b) => b.notaValor - a.notaValor || b.viralScore - a.viralScore);
-    } else {
-      listaAtivaMusicas = faixasFiltradas.filter(f => f.popularidadeTipo === "Oportunidade" || f.popularidadeTipo === "Tendência")
-                                        .sort((a, b) => b.viralScore - a.viralScore);
-    }
-
-    renderizarLinhasMusica(containerLista, listaAtivaMusicas);
-    ponteiroTermo = (ponteiroTermo + 1) % termosRankings.length;
-  }
-
-  function renderizarLinhasMusica(container, listaDeFaixas) {
-    if (!listaDeFaixas.length) {
-      container.innerHTML = '<p style="text-align:center;color:#888;font-size:0.85rem;padding:20px;">Nenhuma faixa encontrada para este filtro.</p>';
-      return;
-    }
-
-    container.innerHTML = listaDeFaixas.map((musica, indice) => {
-      const estaTocando = indiceMusicaAtual === indice;
-      return `
-        <div class="music-row ${estaTocando ? 'playing' : ''}" id="row-${indice}">
-          <div class="row-main" onclick="window.executarAudioDJ(${indice})">
-            <img class="row-cover" src="${musica.albumCover}" alt="">
-            <div class="row-details">
-              <div class="row-title">${musica.title} (${musica.ano})</div>
-              <div class="row-artist">${musica.artist} • <span style="color:var(--accent); font-weight:bold;">${musica.genero}</span></div>
-              <div style="font-size:0.75rem; color:#999; margin-top:2px;">
-                ⏱️ ${musica.bpm} BPM | ⚡ Energia: ${musica.energia} | 📈 Crescimento: ${musica.crescimento}
-              </div>
-              <div style="font-size:0.72rem; color:var(--accent2); margin-top:1px; font-weight:500;">
-                🎯 ${musica.usoPista} | ${musica.notaEstrelas}
-              </div>
-            </div>
-          </div>
-          <div class="row-actions">
-            <button class="row-btn" onclick="window.adicionarAoSetDJ('${musica.id}', ${indice})">➕</button>
-          </div>
-        </div>`;
-    }).join('');
-  }
-
-  window.executarAudioDJ = function(indice) {
-    if (indice < 0 || indice >= listaAtivaMusicas.length) return;
-    indiceMusicaAtual = indice;
-    const faixa = listaAtivaMusicas[indice];
-
-    if (!faixa.preview) {
-      exibirAlerta("⚠️ Prévia indisponível, pulando para a próxima...");
-      window.executarAudioDJ(indice + 1);
-      return;
-    }
-
-    $('#playerCover').src = faixa.albumCover;
-    $('#playerTitle').textContent = faixa.title;
-    $('#playerArtist').textContent = `${faixa.artist} — ${faixa.genero}`;
-    $('#playerPlayPauseBtn').textContent = "⏸";
-
-    reprodutorAudio.src = faixa.preview;
-    reprodutorAudio.play().catch(() => window.executarAudioDJ(indice + 1));
-  };
-
-  // EXPORTAÇÃO E PLAYLISTS PERSONALIZADAS
-  window.adicionarAoSetDJ = function(idFaixa, indice) {
-    if (!setsPersonalizados.length) {
-      exibirAlerta('⚠️ Crie um Set na aba "Meus Sets" primeiro.');
-      return;
-    }
-    let menuOpcoes = setsPersonalizados.map((s, idx) => `${idx + 1}: Set ${s.nome}`).join('\n');
-    let escolha = prompt(`Selecione o número do Set destino:\n\n${menuOpcoes}`);
-    if (!escolha) return;
-
-    let posicaoSet = parseInt(escolha) - 1;
-    if (setsPersonalizados[posicaoSet]) {
-      const track = listaAtivaMusicas[indice];
-      if (setsPersonalizados[posicaoSet].musicas.some(m => m.id === idFaixa)) {
-        exibirAlerta('Essa música já está salva nesse Set.');
-        return;
-      }
-      setsPersonalizados[posicaoSet].musicas.push(track);
-      localStorage.setItem('djradar_sets', JSON.stringify(setsPersonalizados));
-      exibirAlerta(`✅ Salva em: ${setsPersonalizados[posicaoSet].nome}`);
-      renderPlaylists();
-    }
-  };
-
-  window.exportarRepertoio = function(indiceSet, formato) {
-    const setAlvo = setsPersonalizados[indiceSet];
-    let conteudoStr = "";
-    let extensao = "txt";
-
-    if (formato === 'txt' || formato === 'spotify') {
-      conteudoStr = setAlvo.musicas.map(m => `${m.artist} - ${m.title}`).join('\n');
-      if (formato === 'spotify') {
-        navigator.clipboard.writeText(conteudoStr);
-        exibirAlerta("📋 Lista copiada para a área de transferência do celular!");
-        return;
-      }
-    } else if (formato === 'csv') {
-      extensao = "csv";
-      conteudoStr = "Artista,Titulo,BPM,Energia\n" + setAlvo.musicas.map(m => `"${m.artist}","${m.title}",${m.bpm},"${m.energia}"`).join('\n');
-    }
-
-    const blob = new Blob([conteudoStr], { type: "text/plain;charset=utf-8" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `${setAlvo.nome}_Radar_Set.${extensao}`;
-    link.click();
-  };
-
-  $('#createPlaylistBtn').addEventListener('click', () => {
-    const nome = $('#newPlaylistName').value;
-    if (!nome) { exibirAlerta('Escolha um tipo de evento!'); return; }
-    if (setsPersonalizados.some(p => p.nome === nome)) { exibirAlerta('Você já criou um set para este evento!'); return; }
-    
-    setsPersonalizados.push({ nome: nome, musicas: [] });
-    localStorage.setItem('djradar_sets', JSON.stringify(setsPersonalizados));
-    renderPlaylists();
-    exibirAlerta(`Set "${nome}" pronto!`);
-  });
-
-  function renderPlaylists() {
-    const container = $('#playlistsList');
-    if (!setsPersonalizados.length) { container.innerHTML = '<p style="text-align:center;color:#888;font-size:0.85rem;padding:15px;">Nenhum set criado.</p>'; return; }
-    
-    container.innerHTML = setsPersonalizados.map((pl, i) => `
-      <div class="playlist-box">
-        <div class="playlist-header">
-          <strong>📂 Repertório: ${pl.nome}</strong>
-          <span style="color:var(--text2);font-size:0.75rem;">${pl.musicas.length} tracks</span>
-        </div>
-        <div style="max-height:100px; overflow-y:auto; margin-bottom:8px;">
-          ${pl.musicas.map((t, idx) => `<div class="playlist-track"><span>${idx+1}. ${t.artist} - ${t.title}</span></div>`).join('') || '<p style="font-size:0.75rem;color:#555;">Nenhuma música salva.</p>'}
-        </div>
-        <div style="display:flex; gap:4px;">
-          <button onclick="exportarRepertoio(${i}, 'spotify')" style="flex:1; padding:6px; background:var(--surface2); border:1px solid #333; color:white; border-radius:6px; font-size:0.7rem; cursor:pointer;">📋 Copiar Texto</button>
-          <button onclick="exportarRepertoio(${i}, 'csv')" style="flex:1; padding:6px; background:var(--accent); border:none; color:white; border-radius:6px; font-size:0.7rem; font-weight:600; cursor:pointer;">💾 Baixar CSV</button>
-        </div>
-      </div>
-    `).join('');
-  }
-
-  // ACIONADORES DE INTERFACE E ALTERNADORES DE TABS
-  $('#manualSearchBtn').addEventListener('click', async () => {
-    const termo = $('#manualSearchInput').value.trim();
-    if(!termo) return;
-    const listaResultados = $('#hitsList');
-    listaResultados.innerHTML = '<div class="spinner"></div>';
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelector(`[data-tab="hits"]`).classList.add('active');
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    $('#hits').classList.add('active');
-    
-    listaAtivaMusicas = await buscarMusicasPro(termo);
-    renderizarLinhasMusica(listaResultados, listaAtivaMusicas);
-  });
-
-  $('#btnHits').addEventListener('click', () => {
-    modoDescobertaAtual = "hits_momento";
-    $('#btnOportunidades').classList.remove('active');
-    $('#btnHits').classList.add('active');
-    atualizarRankingsEstrategicos();
-  });
-
-  $('#btnOportunidades').addEventListener('click', () => {
-    modoDescobertaAtual = "oportunidades";
-    $('#btnHits').classList.remove('active');
-    $('#btnOportunidades').classList.add('active');
-    atualizarRankingsEstrategicos();
-  });
-
-  $('#timeFilter').addEventListener('change', (e) => {
-    filtroPeriodoAtual = parseInt(e.target.value);
-    atualizarRankingsEstrategicos();
-  });
-
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-      $('#' + tab.dataset.tab).classList.add('active');
-      if (tab.dataset.tab === 'oportunidades') atualizarRankingsEstrategicos();
-      if (tab.dataset.tab === 'playlists') renderPlaylists();
-    });
-  });
-
-  $('#refreshOpp').addEventListener('click', atualizarRankingsEstrategicos);
-  atualizarRankingsEstrategicos();
-
-})();
-</script>
 </body>
 </html>
